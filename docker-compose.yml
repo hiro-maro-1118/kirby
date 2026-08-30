@@ -8,7 +8,7 @@ services:
     ports:
       - "8080:80"
     volumes:
-      # NAS上で問題データを編集・追加した際に即座に反映されるボリュームマウント
-      - ./data:/usr/share/nginx/html/data:ro
+      # プロジェクト全体をマウントして、NAS上のコード・データ更新を即時反映
+      - .:/usr/share/nginx/html:ro
     environment:
       - TZ=Asia/Tokyo
