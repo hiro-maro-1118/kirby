@@ -17,11 +17,11 @@ export class StorageManager {
   async loadAllData() {
     try {
       // 1. 進化ツリーロード
-      const evoRes = await fetch('./data/evolution_tree.json');
+      const evoRes = await fetch(`./data/evolution_tree.json?v=${Date.now()}`, { cache: 'no-store' });
       this.evolutionTree = await evoRes.json();
 
       // 2. ごはんデータロード
-      const foodRes = await fetch('./data/foods.json');
+      const foodRes = await fetch(`./data/foods.json?v=${Date.now()}`, { cache: 'no-store' });
       const foodJson = await foodRes.json();
       this.foods = foodJson.foods;
 
@@ -42,7 +42,7 @@ export class StorageManager {
       this.questions = [];
       for (const file of dataFiles) {
         try {
-          const res = await fetch(`./data/${file}`);
+          const res = await fetch(`./data/${file}?v=${Date.now()}`, { cache: 'no-store' });
           if (res.ok) {
             const data = await res.json();
             const defaultSubj = data.subject || '算数';

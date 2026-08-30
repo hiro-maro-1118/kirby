@@ -96,6 +96,9 @@ class AdminDashboard {
     } else {
       sectionQ.classList.remove('hidden');
       sectionStats.classList.add('hidden');
+      if (document.getElementById('qCategory')) {
+        document.getElementById('qCategory').value = cat;
+      }
 
       const labels = {
         general: '📝 とりあえず作る',
@@ -136,6 +139,7 @@ class AdminDashboard {
     const grade = parseInt(document.getElementById('qGrade').value, 10);
     const subject = document.getElementById('qSubject').value;
     const unit = document.getElementById('qUnit').value.trim() || '保護者カスタム';
+    const category = document.getElementById('qCategory') ? document.getElementById('qCategory').value : this.currentCategory;
     const type = document.getElementById('qType').value;
     const passage = document.getElementById('qPassage').value.trim();
     const question = document.getElementById('qQuestion').value.trim();
@@ -170,7 +174,7 @@ class AdminDashboard {
       subject,
       unit,
       type,
-      category: this.currentCategory,
+      category,
       passage: type === 'passage' ? passage : undefined,
       question,
       options,
@@ -204,6 +208,9 @@ class AdminDashboard {
     document.getElementById('qGrade').value = q.grade;
     document.getElementById('qSubject').value = q.subject;
     document.getElementById('qUnit').value = q.unit || '';
+    if (document.getElementById('qCategory')) {
+      document.getElementById('qCategory').value = q.category || 'general';
+    }
     document.getElementById('qType').value = q.type;
     document.getElementById('qQuestion').value = q.question;
     document.getElementById('qPassage').value = q.passage || '';
@@ -335,15 +342,14 @@ class AdminDashboard {
     const saveData = this.storage.loadGameData();
     const p = saveData.pet || {};
 
-    const totalSolved = p.totalQuestionsSolved || 0;
-    const totalCorrect = p.correctCount || 0;
-    const accuracy = totalSolved > 0 ? Math.round((totalCorrect / totalSolved) * 100) : 0;
-    const weakCount = (p.wrongQuestionIds || []).length;
+    const all = this.storage.getAllQuestions();
+    const weakCategoryCount = all.filter(q => q.category === 'weak').length;
+    const wrongCount = (p.wrongQuestionIds || []).length;
 
     document.getElementById('statTotalSolved').innerHTML = `${totalSolved} <small>問</small>`;
     document.getElementById('statTotalCorrect').innerHTML = `${totalCorrect} <small>問</small>`;
     document.getElementById('statOverallAccuracy').textContent = `${accuracy}%`;
-    document.getElementById('statWeakCount').innerHTML = `${weakCount} <small>問</small>`;
+    document.getElementById('statWeakCount').innerHTML = `${weakCategoryCount} <small>問 (うちリベンジ: ${wrongCount}問)</small>`;
 
     const table = document.getElementById('subjectStatsTable');
     table.innerHTML = '';

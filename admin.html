@@ -103,14 +103,23 @@
               <input type="text" id="qUnit" placeholder="例: 小数のわり算、敬語、日常会話">
             </div>
             <div class="form-group">
-              <label for="qType">問題形式 <span class="required">*</span></label>
-              <select id="qType" required>
-                <option value="choice" selected>4択問題</option>
-                <option value="fill">穴埋め問題</option>
-                <option value="numeric">数字入力問題</option>
-                <option value="passage">長文読解問題</option>
+              <label for="qCategory">問題の区分 <span class="required">*</span></label>
+              <select id="qCategory" required>
+                <option value="general" selected>📝 とりあえず作る（通常）</option>
+                <option value="weak">⚠️ にがてな問題（重点克服・3倍被ダメ）</option>
+                <option value="advanced">🚀 1学年上の問題（応用チャレンジ）</option>
               </select>
             </div>
+          </div>
+
+          <div class="form-group">
+            <label for="qType">問題形式 <span class="required">*</span></label>
+            <select id="qType" required>
+              <option value="choice" selected>4択問題</option>
+              <option value="fill">穴埋め問題</option>
+              <option value="numeric">数字入力問題</option>
+              <option value="passage">長文読解問題</option>
+            </select>
           </div>
 
           <!-- 長文読解時の本文入力 -->
