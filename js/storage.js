@@ -90,6 +90,7 @@ export class StorageManager {
         energy: 100,    // 0-100 (HP / 元気度)
         happy: 100,     // 0-100 (ごきげん度)
         poopCount: 0,   // うんちの数 (0-12)
+        lastCleanTime: now, // 最後にそうじした時刻
         isSick: false,  // 病気フラグ
         sickStartTime: null, // 病気になった時刻
         isDead: false,  // 死亡フラグ

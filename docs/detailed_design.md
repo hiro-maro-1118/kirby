@@ -119,10 +119,11 @@ graph TD
 #### オフライン差分計算の詳細ロジック
 
 ```
-入力: lastAccessTime, 現在時刻 now
-elapsed = (now - lastAccessTime) / 3600  // 経過時間[h]
+入力: lastAccessTime, lastCleanTime, 現在時刻 now
+elapsed = (now - lastAccessTime) / 3600  // アクセス間経過時間[h]
+elapsedClean = (now - lastCleanTime) / 3600 // そうじからの経過時間[h]
 
-1. うんち増加: floor(elapsed / 4) 個追加 (最大12個)
+1. うんち増加: min(12, floor(elapsedClean)) 個に更新
 2. 満腹度減少: elapsed × (100/48) ポイント
 3. HP減少:
    poopMultiplier = 1.0 + (poopCount × 0.1)
@@ -431,7 +432,7 @@ for each param in food.params:
 
 | 項目 | 値 |
 |------|-----|
-| 蓄積レート | 4時間に1個 |
+| 蓄積レート | そうじから1時間に1個 |
 | 最大数 | 12個 |
 | HP減少加速 | うんち1個あたり +0.1倍（12個で2.2倍） |
 | おそうじ効果 | 全除去、ごきげん度 +5×個数、HP +10 |

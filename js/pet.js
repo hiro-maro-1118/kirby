@@ -63,11 +63,13 @@ export class KirbyPet {
 
     const elapsedHours = elapsedSec / 3600;
 
-    // 1. うんちの増加 (4時間に1個、最大12個)
-    const newPoops = Math.floor(elapsedHours / 4);
-    if (newPoops > 0) {
-      this.pet.poopCount = Math.min(12, (this.pet.poopCount || 0) + newPoops);
+    // 1. うんちの増加 (そうじしてから1時間に1個、最大12個)
+    if (!this.pet.lastCleanTime) {
+      const currentPoops = this.pet.poopCount || 0;
+      this.pet.lastCleanTime = lastAccess - (currentPoops * 3600 * 1000);
     }
+    const elapsedSinceCleanHours = Math.max(0, (now - this.pet.lastCleanTime) / (3600 * 1000));
+    this.pet.poopCount = Math.min(12, Math.floor(elapsedSinceCleanHours));
 
     // 2. 満腹度の減少 (48時間で100%消費 -> 1時間あたり約2.08%)
     const hungerDrop = elapsedHours * (100 / 48);
@@ -132,9 +134,12 @@ export class KirbyPet {
       // ごきげん減少
       this.pet.happy = Math.max(0, this.pet.happy - elapsedHours * (100 / 48));
 
-      // 4時間ごとにうんち (確率または時間)
-      if (Math.random() < (1 / 240) && this.pet.poopCount < 12) {
-        this.pet.poopCount = Math.min(12, this.pet.poopCount + 1);
+      // そうじしてからの経過時間に応じてうんち数を計算 (1時間ごとに1個、最大12個)
+      const cleanTime = this.pet.lastCleanTime || now;
+      const expectedPoops = Math.min(12, Math.floor((now - cleanTime) / (3600 * 1000)));
+      if (expectedPoops !== this.pet.poopCount) {
+        this.pet.poopCount = expectedPoops;
+        if (this.onStateChange) this.onStateChange();
       }
 
       // 病気判定
@@ -240,6 +245,8 @@ export class KirbyPet {
   // --- おそうじ（うんちをすべて吸い込む） ---
   clean() {
     if (this.pet.poopCount <= 0) {
+      this.pet.lastCleanTime = Date.now();
+      this.save();
       sound.playHappy();
       return { cleaned: 0 };
     }
@@ -248,6 +255,7 @@ export class KirbyPet {
     sound.playInhale();
     this.currentState = 'inhaling';
     this.pet.poopCount = 0;
+    this.pet.lastCleanTime = Date.now();
     this.pet.happy = Math.min(100, this.pet.happy + count * 5);
     this.pet.energy = Math.min(100, this.pet.energy + 10);
     if (this.onStateChange) this.onStateChange();
@@ -391,6 +399,7 @@ export class KirbyPet {
     this.pet.hunger = 100;
     this.pet.happy = 100;
     this.pet.poopCount = 0;
+    this.pet.lastCleanTime = Date.now();
     
     // おむつカービィに戻る
     this.pet.currentFormId = 'baby_kirby';
@@ -413,6 +422,7 @@ export class KirbyPet {
     this.pet.hunger = 80;
     this.pet.happy = 100;
     this.pet.poopCount = 0;
+    this.pet.lastCleanTime = Date.now();
     
     // パラメータを一部リセット（新しい進化ルートを目指せるように）
     this.pet.hiddenParams = {
