@@ -30,9 +30,10 @@ class AdminDashboard {
   }
 
   updateCategoryCounts() {
-    const generalCount = this.storage.customQuestions.filter(q => q.category === 'general').length;
-    const weakCount = this.storage.customQuestions.filter(q => q.category === 'weak').length;
-    const advancedCount = this.storage.customQuestions.filter(q => q.category === 'advanced').length;
+    const all = this.storage.getAllQuestions();
+    const generalCount = all.filter(q => (q.category || 'general') === 'general').length;
+    const weakCount = all.filter(q => q.category === 'weak').length;
+    const advancedCount = all.filter(q => q.category === 'advanced').length;
 
     document.getElementById('countGeneral').textContent = generalCount;
     document.getElementById('countWeak').textContent = weakCount;
@@ -251,13 +252,9 @@ class AdminDashboard {
     const filterSubject = document.getElementById('filterSubject').value;
     const search = document.getElementById('filterSearch').value.trim().toLowerCase();
 
-    // 現在のタブ区分で絞り込み（カスタム問題 + デフォルト問題）
-    let list = this.storage.customQuestions.filter(q => q.category === this.currentCategory);
-
-    // デフォルト問題もとりあえず作るタブで表示
-    if (this.currentCategory === 'general') {
-      list = [...list, ...this.storage.questions];
-    }
+    // 現在のタブ区分で絞り込み（カスタム問題 + デフォルト問題すべて）
+    const all = this.storage.getAllQuestions();
+    let list = all.filter(q => (q.category || 'general') === this.currentCategory);
 
     // 学年フィルタ
     if (filterGrade !== 'all') {

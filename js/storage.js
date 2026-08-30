@@ -56,7 +56,7 @@ export class StorageManager {
                   subject: q.subject || defaultSubj,
                   unit: q.unit || defaultUnit,
                   grade: q.grade || defaultGrade,
-                  category: 'general'
+                  category: q.category || 'general'
                 });
               }
             }

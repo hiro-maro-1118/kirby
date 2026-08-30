@@ -267,6 +267,11 @@ class KirbyApp {
       });
     });
 
+    document.getElementById('btnWeakCategory')?.addEventListener('click', () => {
+      const grade = document.getElementById('selectGrade').value;
+      this.start5QuestionSession({ category: 'weak', grade: grade });
+    });
+
     document.getElementById('btnRevengeMode').addEventListener('click', () => {
       this.start5QuestionSession({ isRevenge: true });
     });
