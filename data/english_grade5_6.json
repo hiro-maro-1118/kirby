@@ -12,7 +12,12 @@
       "monster": "bronto_burt",
       "foodReward": "magic_candy",
       "question": "「おはようございます！」を英語で言うとどれかな？",
-      "options": ["Good morning!", "Good afternoon!", "Good evening!", "Good night!"],
+      "options": [
+        "Good morning!",
+        "Good afternoon!",
+        "Good evening!",
+        "Good night!"
+      ],
       "answer": 0,
       "hint": "朝のあいさつだよ！",
       "explanation": "朝のあいさつは「Good morning!」です（昼は Good afternoon、夜は Good evening、おやすみは Good night）。"
@@ -27,7 +32,11 @@
       "foodReward": "apple",
       "question": "「私はリンゴが好きです。」\nI like 【___】.（英語小文字で入力）",
       "answer": "apples",
-      "acceptable": ["apples", "apple", "an apple"],
+      "acceptable": [
+        "apples",
+        "apple",
+        "an apple"
+      ],
       "hint": "リンゴのスペルをアルファベットで書こう！",
       "explanation": "リンゴは英語で「apple（または一般的な複数形 apples）」です。"
     },
@@ -40,7 +49,12 @@
       "monster": "gordo",
       "foodReward": "spark_soda",
       "question": "「Sunday」は何曜日でしょう？",
-      "options": ["月曜日", "水曜日", "金曜日", "日曜日"],
+      "options": [
+        "月曜日",
+        "水曜日",
+        "金曜日",
+        "日曜日"
+      ],
       "answer": 3,
       "hint": "太陽（Sun）の日だよ！",
       "explanation": "Sunday は日曜日です（Monday=月, Tuesday=火, Wednesday=水, Thursday=木, Friday=金, Saturday=土）。"
@@ -54,7 +68,12 @@
       "monster": "waddle_dee",
       "foodReward": "apple",
       "question": "「It's sunny today.」の日本語の意味として正しいものはどれでしょう？",
-      "options": ["今日は晴れです。", "今日は雨です。", "今日はくもりです。", "今日は雪です。"],
+      "options": [
+        "今日は晴れです。",
+        "今日は雨です。",
+        "今日はくもりです。",
+        "今日は雪です。"
+      ],
       "answer": 0,
       "hint": "sun（太陽）からできた言葉だよ！",
       "explanation": "sunny は「晴れ」、rainy は「雨」、cloudy は「くもり」、snowy は「雪」です。"
@@ -68,7 +87,12 @@
       "monster": "bronto_burt",
       "foodReward": "spark_soda",
       "question": "「Can you swim?」と聞かれたときの答え方として正しいものはどれでしょう？",
-      "options": ["Yes, I can.", "Yes, I am.", "No, I do.", "Yes, you can."],
+      "options": [
+        "Yes, I can.",
+        "Yes, I am.",
+        "No, I do.",
+        "Yes, you can."
+      ],
       "answer": 0,
       "hint": "Can で聞かれたら can で答えるよ！",
       "explanation": "「Can you 〜? (〜できますか？)」には「Yes, I can. (はい、できます)」または「No, I cannot (can't). (いいえ、できません)」と答えます。"
@@ -82,7 +106,12 @@
       "monster": "gordo",
       "foodReward": "sword_meat",
       "question": "「今何時ですか？」とたずねる英語はどれでしょう？",
-      "options": ["What time is it now?", "What day is it today?", "How old are you?", "Where do you live?"],
+      "options": [
+        "What time is it now?",
+        "What day is it today?",
+        "How old are you?",
+        "Where do you live?"
+      ],
       "answer": 0,
       "hint": "time は「時間」という意味だよ！",
       "explanation": "時刻を聞くときは「What time is it (now)?」と言います。答えるときは「It's 3:00 (three o'clock).」のように答えます。"
@@ -96,7 +125,12 @@
       "monster": "king_dedede",
       "foodReward": "chili_curry",
       "question": "「I like science and math.」の日本語の意味はどれでしょう？",
-      "options": ["私は理科と算数が好きです。", "私は国語と社会が好きです。", "私は英語と音楽が好きです。", "私は体育と図工が好きです。"],
+      "options": [
+        "私は理科と算数が好きです。",
+        "私は国語と社会が好きです。",
+        "私は英語と音楽が好きです。",
+        "私は体育と図工が好きです。"
+      ],
       "answer": 0,
       "hint": "science は「理科」、math は「算数・数学」だよ！",
       "explanation": "science＝理科、math＝算数、Japanese＝国語、social studies＝社会、PE＝体育、music＝音楽 です。"
@@ -110,7 +144,12 @@
       "monster": "waddle_dee",
       "foodReward": "ice_cream",
       "question": "「I get up at 7:00 every morning.」の日本語の意味はどれでしょう？",
-      "options": ["私は毎朝7時に起きます。", "私は毎晩7時に寝ます。", "私は7時に学校へ行きます。", "私は7時に朝ごはんを食べます。"],
+      "options": [
+        "私は毎朝7時に起きます。",
+        "私は毎晩7時に寝ます。",
+        "私は7時に学校へ行きます。",
+        "私は7時に朝ごはんを食べます。"
+      ],
       "answer": 0,
       "hint": "get up は「起きる」、every morning は「毎朝」だよ！",
       "explanation": "「get up」は起きる、「go to bed」は寝る、「go to school」は学校に行く です。"
@@ -124,7 +163,12 @@
       "monster": "bronto_burt",
       "foodReward": "star_candy",
       "question": "「August」は何月を表しているでしょう？",
-      "options": ["4月", "8月", "10月", "12月"],
+      "options": [
+        "4月",
+        "8月",
+        "10月",
+        "12月"
+      ],
       "answer": 1,
       "hint": "夏休みの真ん中の月だよ！",
       "explanation": "August は「8月」です（April=4月, October=10月, December=12月）。"
@@ -138,7 +182,12 @@
       "monster": "gordo",
       "foodReward": "magic_candy",
       "question": "お店で「How much is this pen?」と聞きました。何をたずねているでしょう？",
-      "options": ["このペンの値段（いくらですか？）", "このペンの色（何色ですか？）", "このペンの長さ（どのくらい長いですか？）", "このペンは何本ありますか？"],
+      "options": [
+        "このペンの値段（いくらですか？）",
+        "このペンの色（何色ですか？）",
+        "このペンの長さ（どのくらい長いですか？）",
+        "このペンは何本ありますか？"
+      ],
       "answer": 0,
       "hint": "How much は「いくら（値段）」をたずねる表現だよ！",
       "explanation": "「How much is 〜?」は値段をたずねる定番の表現です（例: It's 120 yen.）。"
@@ -152,7 +201,12 @@
       "monster": "king_dedede",
       "foodReward": "sword_meat",
       "question": "道を案内するときに「Turn left at the corner.」と言われました。どうすればよいでしょう？",
-      "options": ["角を左に曲がる", "角を右に曲がる", "まっすぐ進む", "その場で立ち止まる"],
+      "options": [
+        "角を左に曲がる",
+        "角を右に曲がる",
+        "まっすぐ進む",
+        "その場で立ち止まる"
+      ],
       "answer": 0,
       "hint": "left は「左」、right は「右」だよ！",
       "explanation": "Turn left＝左に曲がる、Turn right＝右に曲がる、Go straight＝まっすぐ進む です。"
@@ -166,7 +220,12 @@
       "monster": "waddle_dee",
       "foodReward": "apple",
       "question": "「Where is the station?」の日本語の意味はどれでしょう？",
-      "options": ["駅はどこですか？", "公園はどこですか？", "病院はどこですか？", "学校はどこですか？"],
+      "options": [
+        "駅はどこですか？",
+        "公園はどこですか？",
+        "病院はどこですか？",
+        "学校はどこですか？"
+      ],
       "answer": 0,
       "hint": "Where は「どこ」、station は「駅」だよ！",
       "explanation": "Where is 〜? で「〜はどこですか？」と場所をたずねることができます（station＝駅, park＝公園, hospital＝病院）。"
@@ -180,7 +239,12 @@
       "foodReward": "star_candy",
       "passage": "Hello, my name is Kirby. I live in Pupupu Land. I like apples and cake. My favorite season is spring because many beautiful flowers bloom.",
       "question": "What is Kirby's favorite season? (カービィの好きな季節は？)",
-      "options": ["Summer (夏)", "Fall (秋)", "Spring (春)", "Winter (冬)"],
+      "options": [
+        "Summer (夏)",
+        "Fall (秋)",
+        "Spring (春)",
+        "Winter (冬)"
+      ],
       "answer": 2,
       "hint": "「My favorite season is ...」の部分を探そう！",
       "explanation": "「My favorite season is spring (春)」と書いてあります。"
@@ -194,7 +258,12 @@
       "monster": "waddle_dee",
       "foodReward": "sword_meat",
       "question": "「I want to be a teacher.」の日本語の意味はどれ？",
-      "options": ["私は先生になりたいです。", "私は先生が好きです。", "私は学校に行きたいです。", "私は勉強しています。"],
+      "options": [
+        "私は先生になりたいです。",
+        "私は先生が好きです。",
+        "私は学校に行きたいです。",
+        "私は勉強しています。"
+      ],
       "answer": 0,
       "hint": "want to be 〜 で「〜になりたい」だよ！",
       "explanation": "「I want to be a teacher.」＝「私は先生になりたいです。」です。"
@@ -208,7 +277,12 @@
       "monster": "bronto_burt",
       "foodReward": "spark_soda",
       "question": "「I went to Kyoto last week.」の日本語の意味として正しいものはどれでしょう？",
-      "options": ["私は先週京都に行きました。", "私は来週京都に行きます。", "私は今京都にいます。", "私は京都に行きたいです。"],
+      "options": [
+        "私は先週京都に行きました。",
+        "私は来週京都に行きます。",
+        "私は今京都にいます。",
+        "私は京都に行きたいです。"
+      ],
       "answer": 0,
       "hint": "went は go (行く) の過去形、last week は「先週」だよ！",
       "explanation": "went は「行きました」という過去の表現です。「last week」は先週、「yesterday」は昨日を表します。"
@@ -222,7 +296,12 @@
       "monster": "gordo",
       "foodReward": "ice_cream",
       "question": "「Where do you want to go?」と聞かれたときの返事として最もふさわしいものはどれでしょう？",
-      "options": ["I want to go to Australia.", "I like bananas.", "I am twelve years old.", "Yes, I do."],
+      "options": [
+        "I want to go to Australia.",
+        "I like bananas.",
+        "I am twelve years old.",
+        "Yes, I do."
+      ],
       "answer": 0,
       "hint": "行きたい場所（国や町）を答える文を選ぼう！",
       "explanation": "「どこに行きたいですか？」という質問なので、「I want to go to 〜 (〜に行きたいです)」と答えます。"
@@ -236,7 +315,12 @@
       "monster": "king_dedede",
       "foodReward": "chili_curry",
       "question": "「doctor」は日本語でどんな職業でしょう？",
-      "options": ["医者（いしゃ）", "警察官（けいさつかん）", "宇宙飛行士", "料理人（シェフ）"],
+      "options": [
+        "医者（いしゃ）",
+        "警察官（けいさつかん）",
+        "宇宙飛行士",
+        "料理人（シェフ）"
+      ],
       "answer": 0,
       "hint": "病院で患者さんを診察してくれる先生だよ！",
       "explanation": "doctor＝医者、police officer＝警察官、astronaut＝宇宙飛行士、cook (chef)＝料理人 です。"
@@ -250,7 +334,12 @@
       "monster": "waddle_dee",
       "foodReward": "apple",
       "question": "外国人の友だちに「Mount Fuji is the highest mountain in Japan.」と紹介しました。何と言っているでしょう？",
-      "options": ["富士山は日本で一番高い山です。", "富士山は日本で一番美しい山です。", "富士山は東京の近くにあります。", "私は富士山に登りたいです。"],
+      "options": [
+        "富士山は日本で一番高い山です。",
+        "富士山は日本で一番美しい山です。",
+        "富士山は東京の近くにあります。",
+        "私は富士山に登りたいです。"
+      ],
       "answer": 0,
       "hint": "highest は「一番高い」、mountain は「山」だよ！",
       "explanation": "Mount Fuji（富士山）は「the highest mountain in Japan（日本で最も高い山）」という意味です。"
@@ -264,7 +353,12 @@
       "foodReward": "maxim_tomato",
       "passage": "Ken went to the zoo with his family yesterday. He saw many animals like lions, elephants, and pandas. His favorite animal was the panda because it was very cute and eating bamboo.",
       "question": "What was Ken's favorite animal at the zoo?",
-      "options": ["Panda", "Lion", "Elephant", "Monkey"],
+      "options": [
+        "Panda",
+        "Lion",
+        "Elephant",
+        "Monkey"
+      ],
       "answer": 0,
       "hint": "「His favorite animal was the ...」の部分を探そう！",
       "explanation": "「His favorite animal was the panda (パンダ)」と書かれています。"
@@ -278,7 +372,12 @@
       "monster": "gordo",
       "foodReward": "star_candy",
       "question": "友だちに「Thank you for your help! (手伝ってくれてありがとう！)」と言われました。どう返事をするのが最も自然でしょう？",
-      "options": ["You're welcome.", "I'm sorry.", "Goodbye.", "Good morning."],
+      "options": [
+        "You're welcome.",
+        "I'm sorry.",
+        "Goodbye.",
+        "Good morning."
+      ],
       "answer": 0,
       "hint": "「どういたしまして」の英語表現だよ！",
       "explanation": "「Thank you」に対する返事（どういたしまして）は「You're welcome.」です。"
@@ -292,7 +391,12 @@
       "monster": "waddle_dee",
       "foodReward": "magic_candy",
       "question": "「How are you?」と聞かれたときの返事として正しいものはどれでしょう？",
-      "options": ["I'm fine, thank you.", "My name is Ken.", "It's 10 o'clock.", "I'm from Japan."],
+      "options": [
+        "I'm fine, thank you.",
+        "My name is Ken.",
+        "It's 10 o'clock.",
+        "I'm from Japan."
+      ],
       "answer": 0,
       "hint": "ごきげんや体調をたずねる定番のあいさつだよ！",
       "explanation": "「How are you? (お元気ですか？)」には「I'm fine, thank you. (元気です、ありがとう)」や「I'm happy.」「I'm tired.」などで答えます。"
@@ -306,10 +410,585 @@
       "foodReward": "sword_meat",
       "passage": "Emi likes music very much. She plays the piano every day after school. She wants to be a pianist in the future and play music for people all over the world.",
       "question": "What does Emi want to be in the future? (エミの将来の夢は？)",
-      "options": ["Pianist (ピアニスト)", "Singer (歌手)", "Doctor (医者)", "Teacher (先生)"],
+      "options": [
+        "Pianist (ピアニスト)",
+        "Singer (歌手)",
+        "Doctor (医者)",
+        "Teacher (先生)"
+      ],
       "answer": 0,
       "hint": "「She wants to be a ...」の部分を見つけよう！",
       "explanation": "「She wants to be a pianist (ピアニスト)」と書かれています。"
+    },
+    {
+      "id": "eng-5-13",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "天気",
+      "monster": "waddle_dee",
+      "foodReward": "apple",
+      "question": "「How is the weather today?」と聞かれました。「今日は雨です」と答える英語はどれでしょう？",
+      "options": [
+        "It is rainy today.",
+        "It is sunny today.",
+        "It is cold today.",
+        "It is windy today."
+      ],
+      "answer": 0,
+      "hint": "rain（雨）に y をつけた単語だよ！",
+      "explanation": "rainy は「雨模様・雨降り」です（sunny＝晴れ, cloudy＝くもり, snowy＝雪）。"
+    },
+    {
+      "id": "eng-5-14",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "好きなスポーツ",
+      "monster": "bronto_burt",
+      "foodReward": "spark_soda",
+      "question": "「What sport do you like?」の質問に対する答えとして最もふさわしいものはどれでしょう？",
+      "options": [
+        "I like soccer and baseball.",
+        "I like apples and oranges.",
+        "I have two pens.",
+        "I am ten years old."
+      ],
+      "answer": 0,
+      "hint": "好きなスポーツの名前を答えている文を選ぼう！",
+      "explanation": "「何のスポーツが好きですか？」という質問なので、スポーツの名前（soccer, baseball など）で答えます。"
+    },
+    {
+      "id": "eng-5-15",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "持ち物をたずねる",
+      "monster": "gordo",
+      "foodReward": "sword_meat",
+      "question": "「Do you have a ruler?」と聞かれました。持っている場合の正しい返事はどれでしょう？",
+      "options": [
+        "Yes, I do.",
+        "Yes, I am.",
+        "Yes, I can.",
+        "No, I am not."
+      ],
+      "answer": 0,
+      "hint": "Do you 〜? で聞かれたら do で答えるよ！",
+      "explanation": "「Do you have 〜? (〜を持っていますか？)」には「Yes, I do.」または「No, I don't.」と答えます（ruler＝定規・ものさし）。"
+    },
+    {
+      "id": "eng-5-16",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "文房具",
+      "monster": "king_dedede",
+      "foodReward": "chili_curry",
+      "question": "紙を切るときに使う文房具「scissors」の日本語の意味はどれでしょう？",
+      "options": [
+        "はさみ",
+        "のり",
+        "消しゴム",
+        "筆箱"
+      ],
+      "answer": 0,
+      "hint": "2つの刃があるからいつも複数形の s がつくよ！",
+      "explanation": "scissors＝はさみ、glue＝のり、eraser＝消しゴム、pencil case＝筆箱 です。"
+    },
+    {
+      "id": "eng-5-17",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "好きな色",
+      "monster": "waddle_dee",
+      "foodReward": "ice_cream",
+      "question": "「I like blue and green.」の日本語の意味として正しいものはどれでしょう？",
+      "options": [
+        "私は青と緑が好きです。",
+        "私は赤と黄色が好きです。",
+        "私は黒と白が好きです。",
+        "私はピンクと紫が好きです。"
+      ],
+      "answer": 0,
+      "hint": "blue は青、green は緑だよ！",
+      "explanation": "blue＝青、green＝緑、red＝赤、yellow＝黄色、black＝黒、white＝白 です。"
+    },
+    {
+      "id": "eng-5-18",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "食べたいもの",
+      "monster": "bronto_burt",
+      "foodReward": "star_candy",
+      "question": "「What do you want to eat?」の日本語の意味はどれでしょう？",
+      "options": [
+        "何を食べたいですか？",
+        "何を作りたいですか？",
+        "何を飲みたいですか？",
+        "どこへ行きたいですか？"
+      ],
+      "answer": 0,
+      "hint": "eat は「食べる」、want to は「〜したい」だよ！",
+      "explanation": "「What do you want to eat?」は「何を食べたいですか？」という意味です（例: I want to eat pizza.）。"
+    },
+    {
+      "id": "eng-5-19",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "学校の教室・場所",
+      "monster": "gordo",
+      "foodReward": "magic_candy",
+      "question": "本がたくさん置いてある学校の部屋「library」は日本語で何でしょう？",
+      "options": [
+        "図書室（としょしつ）",
+        "音楽室",
+        "体育館",
+        "理科室"
+      ],
+      "answer": 0,
+      "hint": "静かに本を読んだり借りたりする場所だよ！",
+      "explanation": "library＝図書室・図書館、music room＝音楽室、gym＝体育館、science room＝理科室 です。"
+    },
+    {
+      "id": "eng-5-20",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "曜日",
+      "monster": "king_dedede",
+      "foodReward": "maxim_tomato",
+      "question": "「Wednesday」は何曜日を表しているでしょう？",
+      "options": [
+        "水曜日",
+        "火曜日",
+        "木曜日",
+        "土曜日"
+      ],
+      "answer": 0,
+      "hint": "月(Mon)、火(Tue)の次の曜日だよ！",
+      "explanation": "Wednesday は「水曜日」です（Tuesday＝火曜日, Thursday＝木曜日, Saturday＝土曜日）。"
+    },
+    {
+      "id": "eng-5-21",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "月（カレンダー）",
+      "monster": "waddle_dee",
+      "foodReward": "apple",
+      "question": "1年の始まりの月「January」は何月でしょう？",
+      "options": [
+        "1月",
+        "2月",
+        "6月",
+        "11月"
+      ],
+      "answer": 0,
+      "hint": "お正月がある月だよ！",
+      "explanation": "January は「1月」です（February＝2月, June＝6月, November＝11月）。"
+    },
+    {
+      "id": "eng-5-22",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "数・数字",
+      "monster": "bronto_burt",
+      "foodReward": "spark_soda",
+      "question": "英語の数字「twelve」と「twenty」が表す数の正しい組み合わせはどれでしょう？",
+      "options": [
+        "twelve＝12 / twenty＝20",
+        "twelve＝20 / twenty＝12",
+        "twelve＝2 / twenty＝10",
+        "twelve＝11 / twenty＝30"
+      ],
+      "answer": 0,
+      "hint": "twelve は 12、twenty は 20 だよ！",
+      "explanation": "twelve は 12、twenty は 20 です（eleven＝11, thirteen＝13, thirty＝30）。"
+    },
+    {
+      "id": "eng-5-23",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "誕生日",
+      "monster": "gordo",
+      "foodReward": "sword_meat",
+      "question": "「When is your birthday?」と聞かれたときの返事として正しいものはどれでしょう？",
+      "options": [
+        "It is July 7th.",
+        "I like cake.",
+        "I am ten years old.",
+        "Yes, it is."
+      ],
+      "answer": 0,
+      "hint": "When は「いつ」をたずねる言葉だよ！日付を答えよう！",
+      "explanation": "「誕生日はいつですか？」という質問なので、日付（It is July 7th. ＝ 7月7日です）で答えます。"
+    },
+    {
+      "id": "eng-5-24",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "家族の紹介",
+      "monster": "king_dedede",
+      "foodReward": "chili_curry",
+      "question": "写真を見せながら「This is my brother.」と言いました。誰を紹介しているでしょう？",
+      "options": [
+        "私の兄（または弟）",
+        "私の姉（または妹）",
+        "私のお母さん",
+        "私のお父さん"
+      ],
+      "answer": 0,
+      "hint": "brother は男の兄弟、sister は女の姉妹だよ！",
+      "explanation": "brother＝兄・弟、sister＝姉・妹、mother＝母、father＝父 です。"
+    },
+    {
+      "id": "eng-5-25",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "感情・気分",
+      "monster": "waddle_dee",
+      "foodReward": "ice_cream",
+      "question": "「おなかがすいた！」を英語で言うとどれでしょう？",
+      "options": [
+        "I am hungry.",
+        "I am thirsty.",
+        "I am sleepy.",
+        "I am happy."
+      ],
+      "answer": 0,
+      "hint": "hungry は「おなかがすいた」、thirsty は「のどがかわいた」だよ！",
+      "explanation": "hungry＝お腹が空いた、thirsty＝喉が渇いた、sleepy＝眠い、happy＝嬉しい です。"
+    },
+    {
+      "id": "eng-5-26",
+      "subject": "英語",
+      "grade": 5,
+      "type": "passage",
+      "monster": "bronto_burt",
+      "foodReward": "star_candy",
+      "passage": "It is Sunday today. Kirby and Waddle Dee are in the park. Kirby is eating a big strawberry shortcake. Waddle Dee is drinking apple juice under a tree. They are very happy.",
+      "question": "What is Kirby eating in the park? (カービィが公園で食べているものは？)",
+      "options": [
+        "Strawberry shortcake (いちごショートケーキ)",
+        "Apple juice (りんごジュース)",
+        "Hot dog (ホットドッグ)",
+        "Ice cream (アイスクリーム)"
+      ],
+      "answer": 0,
+      "hint": "「Kirby is eating a big ...」の部分を探そう！",
+      "explanation": "「Kirby is eating a big strawberry shortcake」と書かれています。"
+    },
+    {
+      "id": "eng-5-27",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "誘うときの表現",
+      "monster": "gordo",
+      "foodReward": "magic_candy",
+      "question": "友だちをドッジボールに誘うとき、「Let's play dodgeball!」と言いました。これに対するOKの返事はどれでしょう？",
+      "options": [
+        "Sounds good! (いいね！)",
+        "I'm sorry. (ごめんなさい)",
+        "No, thank you. (いいえ、結構です)",
+        "Goodbye. (さようなら)"
+      ],
+      "answer": 0,
+      "hint": "「楽しそうだね！」「いいね！」という英語を選ぼう！",
+      "explanation": "「Let's 〜 (〜しよう！)」に対する賛成の返事には「Sounds good! (いいね！)」や「Sure! (もちろん！)」を使います。"
+    },
+    {
+      "id": "eng-6-11",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "過去形 (ed)",
+      "monster": "waddle_dee",
+      "foodReward": "apple",
+      "question": "「I played soccer yesterday.」の日本語の意味として正しいものはどれでしょう？",
+      "options": [
+        "私は昨日サッカーをしました。",
+        "私は明日サッカーをします。",
+        "私はいつもサッカーをします。",
+        "私はサッカーが上手です。"
+      ],
+      "answer": 0,
+      "hint": "played は play の過去形、yesterday は「昨日」だよ！",
+      "explanation": "動詞に ed がついた played は「〜しました（過去）」を表します。"
+    },
+    {
+      "id": "eng-6-12",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "過去形 (不規則動詞)",
+      "monster": "bronto_burt",
+      "foodReward": "spark_soda",
+      "question": "動詞「eat (食べる)」の過去形「食べました」を表す正しい英語はどれでしょう？",
+      "options": [
+        "ate",
+        "eated",
+        "eating",
+        "eats"
+      ],
+      "answer": 0,
+      "hint": "不規則に変化する単語だよ！ a から始まる3文字！",
+      "explanation": "eat の過去形は「ate (エイト)」です（例: I ate pizza. ＝ 私はピザを食べました）。"
+    },
+    {
+      "id": "eng-6-13",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "過去形 (不規則動詞)",
+      "monster": "gordo",
+      "foodReward": "sword_meat",
+      "question": "「I saw many stars in the sky last night.」の日本語の意味はどれでしょう？",
+      "options": [
+        "私は昨夜、空にたくさんの星を見ました。",
+        "私は今夜、星を見る予定です。",
+        "私は星の絵を描きました。",
+        "私は星空が好きです。"
+      ],
+      "answer": 0,
+      "hint": "saw は see (見る) の過去形、last night は「昨夜」だよ！",
+      "explanation": "saw は see（見る）の過去形（見ました）です。「last night」は昨夜を表します。"
+    },
+    {
+      "id": "eng-6-14",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "将来の夢",
+      "monster": "king_dedede",
+      "foodReward": "chili_curry",
+      "question": "飛行機を操縦する仕事「pilot」になりたいとき、英語でどう言うでしょう？",
+      "options": [
+        "I want to be a pilot.",
+        "I like airplanes.",
+        "I can fly a kite.",
+        "I go to the airport."
+      ],
+      "answer": 0,
+      "hint": "「I want to be 〜 (〜になりたい)」の文を使おう！",
+      "explanation": "「〜になりたい」は「I want to be a [職業].」で表します。"
+    },
+    {
+      "id": "eng-6-15",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "職業",
+      "monster": "waddle_dee",
+      "foodReward": "ice_cream",
+      "question": "病気の犬や猫などの動物を治療してくれるお医者さん「vet」は日本語で何でしょう？",
+      "options": [
+        "獣医（じゅうい）",
+        "警察官",
+        "宇宙飛行士",
+        "消防士"
+      ],
+      "answer": 0,
+      "hint": "veterinarian（獣医師）の短い言い方だよ！",
+      "explanation": "vet は「獣医（動物のお医者さん）」です（police officer＝警察官, firefighter＝消防士）。"
+    },
+    {
+      "id": "eng-6-16",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "理由をたずねる (Why / Because)",
+      "monster": "bronto_burt",
+      "foodReward": "star_candy",
+      "question": "「Why do you like winter?」と聞かれたときの返事として最もふさわしいものはどれでしょう？",
+      "options": [
+        "Because I can ski and make a snowman.",
+        "Yes, I like winter.",
+        "I want to be a teacher.",
+        "It is 3 o'clock."
+      ],
+      "answer": 0,
+      "hint": "Why (なぜ？) と聞かれたら Because (なぜなら〜だから) で答えるよ！",
+      "explanation": "「なぜ冬が好きなのですか？」という質問には、「Because 〜 (なぜならスキーができて雪だるまを作れるからです)」と理由を答えます。"
+    },
+    {
+      "id": "eng-6-17",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "行きたい国",
+      "monster": "gordo",
+      "foodReward": "magic_candy",
+      "question": "「I want to visit Canada.」の日本語の意味として正しいものはどれでしょう？",
+      "options": [
+        "私はカナダを訪れたい（旅行したい）です。",
+        "私はカナダに住んでいます。",
+        "私はカナダから来ました。",
+        "カナダはとても寒いです。"
+      ],
+      "answer": 0,
+      "hint": "visit は「訪れる・訪問する」という意味だよ！",
+      "explanation": "「visit」は訪れるという意味なので、「I want to visit Canada.」＝「私はカナダを訪れたいです。」となります。"
+    },
+    {
+      "id": "eng-6-18",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "道案内",
+      "monster": "king_dedede",
+      "foodReward": "sword_meat",
+      "question": "「Go straight for one block and turn right.」の日本語の意味はどれでしょう？",
+      "options": [
+        "1ブロックまっすぐ進んで、右に曲がってください。",
+        "1ブロックまっすぐ進んで、左に曲がってください。",
+        "角を左に曲がって止まってください。",
+        "後ろを振り返ってまっすぐ歩いてください。"
+      ],
+      "answer": 0,
+      "hint": "straight はまっすぐ、turn right は右に曲がるだよ！",
+      "explanation": "Go straight＝まっすぐ進む、turn right＝右に曲がる です。"
+    },
+    {
+      "id": "eng-6-19",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "初対面のあいさつ",
+      "monster": "waddle_dee",
+      "foodReward": "apple",
+      "question": "初めて会った人に「Nice to meet you. (はじめまして)」と言われました。どう返事をするのが正しいでしょう？",
+      "options": [
+        "Nice to meet you, too.",
+        "Good night.",
+        "I am sorry.",
+        "You are welcome."
+      ],
+      "answer": 0,
+      "hint": "「こちらこそよろしくね！」の too をつけた返事だよ！",
+      "explanation": "「Nice to meet you.」には「Nice to meet you, too. (こちらこそお会いできて嬉しいです)」と返します。"
+    },
+    {
+      "id": "eng-6-20",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "別れのあいさつ",
+      "monster": "bronto_burt",
+      "foodReward": "spark_soda",
+      "question": "学校の帰りに友だちに「See you tomorrow!」と言いました。どんな意味でしょう？",
+      "options": [
+        "また明日ね！",
+        "さようなら、また来週！",
+        "おはよう！",
+        "気をつけて帰ってね！"
+      ],
+      "answer": 0,
+      "hint": "tomorrow は「明日」という意味だよ！",
+      "explanation": "「See you tomorrow!」は「また明日ね！」という別れの挨拶です（See you next week! ＝ また来週！）。"
+    },
+    {
+      "id": "eng-6-21",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "就寝時刻",
+      "monster": "gordo",
+      "foodReward": "ice_cream",
+      "question": "「What time do you go to bed?」の質問の日本語の意味はどれでしょう？",
+      "options": [
+        "あなたは何時に寝ますか？",
+        "あなたは何時に起きますか？",
+        "あなたは何時に夕食を食べますか？",
+        "あなたは何時に学校に行きますか？"
+      ],
+      "answer": 0,
+      "hint": "go to bed は「ベッドに行く（寝る）」だよ！",
+      "explanation": "「go to bed」は就寝する（寝る）という意味です（例: I go to bed at 9:30.）。"
+    },
+    {
+      "id": "eng-6-22",
+      "subject": "英語",
+      "grade": 6,
+      "type": "passage",
+      "monster": "king_dedede",
+      "foodReward": "maxim_tomato",
+      "passage": "Yuki went to Hokkaido with her family last winter. It was very cold and snowy. She skied for the first time and had a lot of fun. She also ate delicious ramen.",
+      "question": "What did Yuki do for the first time in Hokkaido?",
+      "options": [
+        "She skied (スキーをした)",
+        "She made a cake (ケーキを作った)",
+        "She swam (泳いだ)",
+        "She played tennis (テニスをした)"
+      ],
+      "answer": 0,
+      "hint": "「She skied for the first time...」の部分を探そう！",
+      "explanation": "「She skied for the first time (初めてスキーをした)」と書かれています。"
+    },
+    {
+      "id": "eng-6-23",
+      "subject": "英語",
+      "grade": 6,
+      "type": "passage",
+      "monster": "waddle_dee",
+      "foodReward": "apple",
+      "passage": "Waddle Dee opened a new bakery in town. He bakes fresh melon bread, croissants, and chocolate donuts every morning. Many people visit his shop because his bread is warm and delicious.",
+      "question": "Why do many people visit Waddle Dee's bakery shop?",
+      "options": [
+        "Because his bread is warm and delicious (パンが温かくて美味しいから)",
+        "Because his shop is very big (店がとても大きいから)",
+        "Because he sells toys (おもちゃを売っているから)",
+        "Because he gives free books (無料の本をくれるから)"
+      ],
+      "answer": 0,
+      "hint": "「Because his bread is warm and delicious」を見つけよう！",
+      "explanation": "「Because his bread is warm and delicious (パンが温かくて美味しいから)」と書かれています。"
+    },
+    {
+      "id": "eng-6-24",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "物を手渡すとき",
+      "monster": "bronto_burt",
+      "foodReward": "star_candy",
+      "question": "消しゴムを友だちに貸してあげるとき、「Here you are.」と言って渡しました。日本語ではどんな意味でしょう？",
+      "options": [
+        "はい、どうぞ。",
+        "ありがとう。",
+        "どういたしまして。",
+        "ごめんなさい。"
+      ],
+      "answer": 0,
+      "hint": "物を渡すときの定番の表現だよ！",
+      "explanation": "「Here you are.」は物を相手に手渡すときの「はい、どうぞ。」という決まり文句です。"
+    },
+    {
+      "id": "eng-6-25",
+      "subject": "英語",
+      "grade": 6,
+      "type": "passage",
+      "monster": "gordo",
+      "foodReward": "sword_meat",
+      "passage": "Meta Knight is a cool swordsman. He practices sword skills every day on the mountain. Kirby wants to be strong like Meta Knight, so they practice together on weekends.",
+      "question": "When do Kirby and Meta Knight practice sword skills together?",
+      "options": [
+        "On weekends (週末に)",
+        "Every Monday (毎週月曜日に)",
+        "At night (夜に)",
+        "In winter (冬に)"
+      ],
+      "answer": 0,
+      "hint": "「they practice together on weekends」の部分を探そう！",
+      "explanation": "「they practice together on weekends (週末にいっしょに練習する)」と書かれています。"
     }
   ]
 }
