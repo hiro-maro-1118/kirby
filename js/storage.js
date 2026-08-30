@@ -125,7 +125,9 @@ export class StorageManager {
           社会: { solved: 0, correct: 0 },
           英語: { solved: 0, correct: 0 }
         },
-        wrongQuestionIds: [] // 苦手問題リベンジリスト
+        wrongQuestionIds: [], // 苦手問題リベンジリスト
+        weakClearCount: {},   // 苦手問題の正解カウント (3回正解で克服)
+        clearedWeakQuestionIds: [] // 克服して通常問題に昇格した問題IDリスト
       }
     };
   }
@@ -146,7 +148,9 @@ export class StorageManager {
           ...data.pet,
           hiddenParams: { ...def.pet.hiddenParams, ...(data.pet?.hiddenParams || {}) },
           inventory: { ...def.pet.inventory, ...(data.pet?.inventory || {}) },
-          studyStats: { ...def.pet.studyStats, ...(data.pet?.studyStats || {}) }
+          studyStats: { ...def.pet.studyStats, ...(data.pet?.studyStats || {}) },
+          weakClearCount: { ...def.pet.weakClearCount, ...(data.pet?.weakClearCount || {}) },
+          clearedWeakQuestionIds: [ ...(data.pet?.clearedWeakQuestionIds || []) ]
         }
       };
     } catch (e) {
@@ -198,8 +202,16 @@ export class StorageManager {
     this.saveCustomQuestions(this.customQuestions);
   }
 
-  // 全問題プール（静的 + カスタム）
+  // 全問題プール（静的 + カスタム、克服済み苦手問題は通常問題に昇格）
   getAllQuestions() {
-    return [...this.questions, ...this.customQuestions];
+    const saveData = this.loadGameData();
+    const clearedIds = new Set(saveData.pet?.clearedWeakQuestionIds || []);
+
+    return [...this.questions, ...this.customQuestions].map(q => {
+      if (q.category === 'weak' && clearedIds.has(q.id)) {
+        return { ...q, category: 'general', isOvercome: true };
+      }
+      return q;
+    });
   }
 }

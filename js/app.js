@@ -265,13 +265,6 @@ class KirbyApp {
           this.start5QuestionSession({ subject: subj, grade: grade });
         }
       });
-    });
-
-    document.getElementById('btnWeakCategory')?.addEventListener('click', () => {
-      const grade = document.getElementById('selectGrade').value;
-      this.start5QuestionSession({ category: 'weak', grade: grade });
-    });
-
     document.getElementById('btnRevengeMode').addEventListener('click', () => {
       this.start5QuestionSession({ isRevenge: true });
     });
@@ -402,9 +395,13 @@ class KirbyApp {
     document.getElementById('battleQType').textContent = typeNames[q.type] || 'クイズ';
 
     document.getElementById('battlePetImg').src = this.pet.currentSpritePath;
-    document.getElementById('battleEnemyImg').src = `./assets/sprites/enemy_${q.monster || 'waddle_dee'}.webp`;
-    document.getElementById('battleEnemyImg').style.transform = 'none';
-    document.getElementById('battleEnemyImg').style.opacity = '1';
+    document.getElementById('battlePetImg').className = 'battle-pet-sprite';
+    const enemyEl = document.getElementById('battleEnemyImg');
+    enemyEl.src = `./assets/sprites/enemy_${q.monster || 'waddle_dee'}.webp`;
+    enemyEl.className = 'battle-enemy-sprite';
+    enemyEl.style.transform = 'none';
+    enemyEl.style.opacity = '1';
+    enemyEl.style.transition = 'none';
     document.getElementById('battleInhaleWind').style.display = 'none';
     document.getElementById('resultDialog').classList.add('hidden');
 
@@ -416,7 +413,14 @@ class KirbyApp {
       passageEl.classList.add('hidden');
     }
 
-    document.getElementById('battleQuestionText').textContent = q.question;
+    // 苦手問題バッジ
+    const isWeak = (q.category === 'weak' && !q.isOvercome);
+    let qPromptHtml = q.question;
+    if (isWeak) {
+      const clearCnt = (this.pet.pet.weakClearCount && this.pet.pet.weakClearCount[q.id]) || 0;
+      qPromptHtml = `<span style="display:inline-block; background:#fee2e2; color:#b91c1c; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:4px; margin-bottom:4px;">⚠️ にがて問題 (正解: ${clearCnt}/3回・ミス時3倍被ダメ)</span><br>` + q.question;
+    }
+    document.getElementById('battleQuestionText').innerHTML = qPromptHtml;
 
     const area = document.getElementById('answersArea');
     area.innerHTML = '';
@@ -491,9 +495,19 @@ class KirbyApp {
 
       setTimeout(() => {
         this.showQuizResultDialog(res);
+        this.updateUI();
       }, 700);
     } else {
-      this.showQuizResultDialog(res);
+      // 敵の反撃アニメーション＆カービィ被弾演出
+      const enemy = document.getElementById('battleEnemyImg');
+      const pet = document.getElementById('battlePetImg');
+      enemy.classList.add('enemy-attacking');
+      pet.classList.add('pet-hit');
+
+      setTimeout(() => {
+        this.showQuizResultDialog(res);
+        this.updateUI();
+      }, 600);
     }
   }
 
@@ -507,14 +521,28 @@ class KirbyApp {
     dialog.classList.remove('hidden');
 
     if (res.isCorrect) {
-      title.textContent = '🌟 大正解！すいこみ成功！';
-      title.className = 'result-title correct';
-      reward.textContent = '✨ やったね！すごいぽよ！';
+      if (res.overcomeWeak) {
+        title.textContent = '🎉 3回正解！ 苦手克服！';
+        title.className = 'result-title correct';
+        reward.innerHTML = '🌟 <strong>苦手を完全に克服したぽよ！</strong><br><small style="color:#059669;">（次回から通常問題に昇格しました）</small>';
+      } else if (res.isWeak) {
+        title.textContent = '🌟 大正解！すいこみ成功！';
+        title.className = 'result-title correct';
+        reward.innerHTML = `✨ 苦手問題クリア！ <strong>（あと ${3 - res.weakClearCount} 回正解で克服）</strong>`;
+      } else {
+        title.textContent = '🌟 大正解！すいこみ成功！';
+        title.className = 'result-title correct';
+        reward.textContent = '✨ やったね！すごいぽよ！';
+      }
       reward.style.display = 'block';
     } else {
-      title.textContent = '💨 ざんねん！にげられた…';
+      title.textContent = '💨 ざんねん！敵の反撃！';
       title.className = 'result-title wrong';
-      reward.textContent = `正解は: 「${res.correctAnswer}」`;
+      if (res.isWeak) {
+        reward.innerHTML = `💥 <strong>${res.damage} ダメージ</strong> をくらった！<br><span style="color:#e11d48; font-weight:bold; font-size:11px;">⚠️ 苦手問題のため3倍の大ダメージ！</span><br><span style="font-size:11px; color:#475569;">正解: 「${res.correctAnswer}」</span>`;
+      } else {
+        reward.innerHTML = `💥 <strong>${res.damage} ダメージ</strong> をくらった！<br><span style="font-size:11px; color:#475569;">正解: 「${res.correctAnswer}」</span>`;
+      }
       reward.style.display = 'block';
     }
 

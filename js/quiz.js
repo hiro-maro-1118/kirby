@@ -226,10 +226,30 @@ export class QuizEngine {
     this.pet.pet.studyStats[q.subject] = stats;
     this.pet.pet.totalQuestionsSolved = (this.pet.pet.totalQuestionsSolved || 0) + 1;
 
+    const isWeak = (q.category === 'weak' && !q.isOvercome);
+    let overcomeWeak = false;
+    let weakClearCount = 0;
+    let damage = 0;
+
     if (isCorrect) {
       stats.correct++;
       this.pet.pet.correctCount = (this.pet.pet.correctCount || 0) + 1;
       sound.playCorrect();
+
+      // 苦手問題の正解カウント管理（3回正解で通常問題に昇格）
+      if (isWeak) {
+        if (!this.pet.pet.weakClearCount) this.pet.pet.weakClearCount = {};
+        weakClearCount = (this.pet.pet.weakClearCount[q.id] || 0) + 1;
+        this.pet.pet.weakClearCount[q.id] = weakClearCount;
+
+        if (weakClearCount >= 3) {
+          if (!this.pet.pet.clearedWeakQuestionIds) this.pet.pet.clearedWeakQuestionIds = [];
+          if (!this.pet.pet.clearedWeakQuestionIds.includes(q.id)) {
+            this.pet.pet.clearedWeakQuestionIds.push(q.id);
+          }
+          overcomeWeak = true;
+        }
+      }
 
       // リベンジ成功時に苦手リストから削除
       const wrongList = this.pet.pet.wrongQuestionIds || [];
@@ -244,6 +264,17 @@ export class QuizEngine {
       }
     } else {
       sound.playWrong();
+
+      // 間違えた時のダメージ計算（通常: 5ダメージ, 苦手問題: 3倍の15ダメージ）
+      damage = isWeak ? 15 : 5;
+      this.pet.pet.energy = Math.max(0, (this.pet.pet.energy || 100) - damage);
+
+      // HPが0になったら病気に移行
+      if (this.pet.pet.energy <= 0 && !this.pet.pet.isSick && !this.pet.pet.isDead) {
+        this.pet.pet.isSick = true;
+        this.pet.pet.sickStartTime = Date.now();
+      }
+
       if (!this.pet.pet.wrongQuestionIds) this.pet.pet.wrongQuestionIds = [];
       if (!this.pet.pet.wrongQuestionIds.includes(q.id)) {
         this.pet.pet.wrongQuestionIds.push(q.id);
@@ -262,7 +293,11 @@ export class QuizEngine {
       explanation: q.explanation || "しっかり見直してみよう！",
       isLastQuestion,
       sessionIndex: this.sessionIndex,
-      totalSession: this.sessionQuestions.length
+      totalSession: this.sessionQuestions.length,
+      isWeak,
+      damage,
+      overcomeWeak,
+      weakClearCount
     };
 
     this.sessionResults.push(result);
