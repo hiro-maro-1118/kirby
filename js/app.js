@@ -265,6 +265,8 @@ class KirbyApp {
           this.start5QuestionSession({ subject: subj, grade: grade });
         }
       });
+    });
+
     document.getElementById('btnRevengeMode').addEventListener('click', () => {
       this.start5QuestionSession({ isRevenge: true });
     });
