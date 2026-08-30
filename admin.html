@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>問題管理ダッシュボード - ぷぷぷ育成フレンズ</title>
+  <link rel="stylesheet" href="./css/admin.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+</head>
+<body>
+
+  <!-- ナビゲーションバー -->
+  <header class="admin-navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="brand-icon">⚙️</span>
+        <h1>ぷぷぷ育成フレンズ <span>問題管理ダッシュボード</span></h1>
+      </div>
+      <div class="nav-actions">
+        <a href="./index.html" class="btn btn-outline">🎮 ゲームに戻る</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="admin-container">
+    
+    <!-- 区分タブ -->
+    <div class="category-tabs">
+      <button class="cat-tab active" data-category="general">
+        <span class="tab-icon">📝</span>
+        <div class="tab-text">
+          <strong>とりあえず作る</strong>
+          <small>通常の練習・自作問題</small>
+        </div>
+        <span class="tab-count" id="countGeneral">0</span>
+      </button>
+      <button class="cat-tab" data-category="weak">
+        <span class="tab-icon">⚠️</span>
+        <div class="tab-text">
+          <strong>にがてな問題</strong>
+          <small>重点的に克服させたい問題</small>
+        </div>
+        <span class="tab-count" id="countWeak">0</span>
+      </button>
+      <button class="cat-tab" data-category="advanced">
+        <span class="tab-icon">🚀</span>
+        <div class="tab-text">
+          <strong>1学年上の問題</strong>
+          <small>先取り・応用チャレンジ問題</small>
+        </div>
+        <span class="tab-count" id="countAdvanced">0</span>
+      </button>
+      <button class="cat-tab" data-category="stats">
+        <span class="tab-icon">📊</span>
+        <div class="tab-text">
+          <strong>学習レポート</strong>
+          <small>正答率・成績分析</small>
+        </div>
+      </button>
+    </div>
+
+    <!-- 1. 問題管理エリア (タブ1〜3) -->
+    <div id="sectionQuestionManagement" class="admin-grid">
+      
+      <!-- 左カラム: 問題作成・編集フォーム -->
+      <section class="admin-card form-card">
+        <div class="card-header">
+          <h2 id="formTitle">➕ 新しい問題を登録</h2>
+          <span class="badge" id="currentCategoryBadge">とりあえず作る</span>
+        </div>
+        
+        <form id="questionForm" class="q-form">
+          <input type="hidden" id="editQuestionId" value="">
+          
+          <div class="form-row grid-2">
+            <div class="form-group">
+              <label for="qGrade">学年 <span class="required">*</span></label>
+              <select id="qGrade" required>
+                <option value="1">小学1年生</option>
+                <option value="2">小学2年生</option>
+                <option value="3">小学3年生</option>
+                <option value="4">小学4年生</option>
+                <option value="5" selected>小学5年生</option>
+                <option value="6">小学6年生</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="qSubject">教科 <span class="required">*</span></label>
+              <select id="qSubject" required>
+                <option value="算数" selected>算数</option>
+                <option value="国語">国語</option>
+                <option value="理科">理科</option>
+                <option value="社会">社会</option>
+                <option value="英語">英語</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row grid-2">
+            <div class="form-group">
+              <label for="qUnit">単元名 / テーマ</label>
+              <input type="text" id="qUnit" placeholder="例: 小数のわり算、敬語、日常会話">
+            </div>
+            <div class="form-group">
+              <label for="qType">問題形式 <span class="required">*</span></label>
+              <select id="qType" required>
+                <option value="choice" selected>4択問題</option>
+                <option value="fill">穴埋め問題</option>
+                <option value="numeric">数字入力問題</option>
+                <option value="passage">長文読解問題</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 長文読解時の本文入力 -->
+          <div class="form-group hidden" id="groupPassage">
+            <label for="qPassage">本文・読解テキスト <span class="required">*</span></label>
+            <textarea id="qPassage" rows="3" placeholder="読解の対象となる長文や対話文を入力してください..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="qQuestion">問題文 <span class="required">*</span></label>
+            <textarea id="qQuestion" rows="2" placeholder="問題文を入力してください..." required></textarea>
+          </div>
+
+          <!-- 4択/長文用の選択肢 -->
+          <div class="form-group" id="groupOptions">
+            <label>選択肢 (4つ入力) <span class="required">*</span></label>
+            <div class="options-grid">
+              <input type="text" class="opt-input" id="opt0" placeholder="選択肢 1">
+              <input type="text" class="opt-input" id="opt1" placeholder="選択肢 2">
+              <input type="text" class="opt-input" id="opt2" placeholder="選択肢 3">
+              <input type="text" class="opt-input" id="opt3" placeholder="選択肢 4">
+            </div>
+          </div>
+
+          <!-- 正解入力 -->
+          <div class="form-row grid-2">
+            <div class="form-group" id="groupChoiceAnswer">
+              <label for="qChoiceAnswer">正解の選択肢 <span class="required">*</span></label>
+              <select id="qChoiceAnswer">
+                <option value="0">1番目の選択肢</option>
+                <option value="1">2番目の選択肢</option>
+                <option value="2">3番目の選択肢</option>
+                <option value="3">4番目の選択肢</option>
+              </select>
+            </div>
+            <div class="form-group hidden" id="groupTextAnswer">
+              <label for="qTextAnswer">正解 <span class="required">*</span></label>
+              <input type="text" id="qTextAnswer" placeholder="正解の言葉や数値を入力">
+            </div>
+            <div class="form-group">
+              <label for="qReward">正解時のごちそう報酬</label>
+              <select id="qReward">
+                <option value="apple">🍎 リンゴ (基本EXP)</option>
+                <option value="chili_curry">🍛 からくちカレー (炎)</option>
+                <option value="sword_meat">🍖 まんが肉 (斬撃)</option>
+                <option value="spark_soda">🥤 でんげきソーダ (雷)</option>
+                <option value="ice_cream">🍦 ソフトクリーム (氷)</option>
+                <option value="magic_candy">🍬 マジックキャンディ (知力)</option>
+                <option value="star_candy">🍭 むてきキャンディ (全能力)</option>
+                <option value="maxim_tomato">🍅 マキシムトマト (究極)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="qExplanation">解説・ヒント</label>
+            <input type="text" id="qExplanation" placeholder="正解後の解説や考え方のヒントを入力">
+          </div>
+
+          <div class="form-buttons">
+            <button type="submit" class="btn btn-primary" id="btnSubmitForm">💾 この問題を保存する</button>
+            <button type="button" class="btn btn-secondary hidden" id="btnCancelEdit">キャンセル</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- 右カラム: 登録済み問題一覧 & フィルタ -->
+      <section class="admin-card list-card">
+        <div class="card-header flex-between">
+          <h2>📋 登録済み問題一覧</h2>
+          <div class="header-tools">
+            <button class="btn btn-sm btn-outline" id="btnExportJson">📤 JSONエクスポート</button>
+            <label class="btn btn-sm btn-outline file-label">
+              📥 JSONインポート
+              <input type="file" id="fileImportJson" accept=".json" style="display:none;">
+            </label>
+          </div>
+        </div>
+
+        <!-- フィルタバー -->
+        <div class="filter-bar">
+          <div class="filter-group">
+            <label>学年:</label>
+            <select id="filterGrade">
+              <option value="all">すべての学年</option>
+              <option value="1">小1</option>
+              <option value="2">小2</option>
+              <option value="3">小3</option>
+              <option value="4">小4</option>
+              <option value="5">小5</option>
+              <option value="6">小6</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>教科:</label>
+            <select id="filterSubject">
+              <option value="all">すべての教科</option>
+              <option value="算数">算数</option>
+              <option value="国語">国語</option>
+              <option value="理科">理科</option>
+              <option value="社会">社会</option>
+              <option value="英語">英語</option>
+            </select>
+          </div>
+          <div class="filter-search">
+            <input type="text" id="filterSearch" placeholder="🔍 キーワード検索...">
+          </div>
+        </div>
+
+        <!-- 問題リスト -->
+        <div class="question-items-container" id="questionListContainer">
+          <!-- 動的挿入 -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- 2. 学習レポートエリア (タブ4) -->
+    <div id="sectionStats" class="admin-card stats-card hidden">
+      <div class="card-header">
+        <h2>📊 お子さまの学習データ・正答率分析</h2>
+      </div>
+
+      <div class="stats-overview-grid">
+        <div class="stat-box">
+          <span class="stat-label">総解答問題数</span>
+          <span class="stat-value" id="statTotalSolved">0 <small>問</small></span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">総正解数</span>
+          <span class="stat-value" id="statTotalCorrect">0 <small>問</small></span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">全体正答率</span>
+          <span class="stat-value" id="statOverallAccuracy">0%</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">現在のにがて問題数</span>
+          <span class="stat-value text-danger" id="statWeakCount">0 <small>問</small></span>
+        </div>
+      </div>
+
+      <div class="stats-detail-section">
+        <h3>📚 教科別成績グラフ</h3>
+        <div class="subject-stats-table" id="subjectStatsTable">
+          <!-- 動的挿入 -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module" src="./js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+{
+  "stages": [
+    {
+      "stage": 1,
+      "name": "おむつ期（ベビー）",
+      "description": "ハイハイするかわいい赤ちゃんカービィ"
+    },
+    {
+      "stage": 2,
+      "name": "成長期（ノーマル）",
+      "description": "ピョンピョン跳ねる元気なピンクのカービィ"
+    },
+    {
+      "stage": 3,
+      "name": "単能力期（シングル）",
+      "description": "食べたごはんの属性の力を身につけたカービィ"
+    },
+    {
+      "stage": 4,
+      "name": "複合能力期（マスターミックス）",
+      "description": "複数の力を掛け合わせた究極の合体カービィ！"
+    }
+  ],
+  "evolutions": [
+    {
+      "id": "baby_kirby",
+      "stage": 1,
+      "name": "おむつカービィ",
+      "title": "ばぶばぶカービィ",
+      "description": "おむつをはいてハイハイする赤ちゃん。ごはんを食べて大きくなろう！",
+      "themeColor": "#ffb6c1",
+      "spriteKey": "baby",
+      "conditions": {
+        "isDefault": true
+      }
+    },
+    {
+      "id": "normal_kirby",
+      "stage": 2,
+      "name": "普通カービィ",
+      "title": "元気いっぱいカービィ",
+      "description": "丸くてピンクのいつものカービィ。いろんなごはんを食べて能力を目覚めさせよう！",
+      "themeColor": "#ff69b4",
+      "spriteKey": "normal",
+      "conditions": {
+        "requiredStage": 1,
+        "minBaseExp": 25
+      }
+    },
+    {
+      "id": "fire_kirby",
+      "stage": 3,
+      "name": "ファイアカービィ",
+      "title": "灼熱の炎マスター",
+      "description": "情熱の炎をまとう！辛いカレーをたくさん食べて熱血パワー全開！",
+      "themeColor": "#ff4500",
+      "spriteKey": "fire",
+      "conditions": {
+        "requiredStage": 2,
+        "params": {
+          "fire": 55
+        }
+      }
+    },
+    {
+      "id": "sword_kirby",
+      "stage": 3,
+      "name": "ソードカービィ",
+      "title": "緑の剣士",
+      "description": "緑のぼうしと剣を装備！お肉を食べて力強い斬撃をくりだす！",
+      "themeColor": "#32cd32",
+      "spriteKey": "sword",
+      "conditions": {
+        "requiredStage": 2,
+        "params": {
+          "slash": 55
+        }
+      }
+    },
+    {
+      "id": "spark_kirby",
+      "stage": 3,
+      "name": "スパークカービィ",
+      "title": "電撃ビリビリ",
+      "description": "電気のバリアを放つ！ソーダを飲んで電撃スパーク！",
+      "themeColor": "#ffd700",
+      "spriteKey": "spark",
+      "conditions": {
+        "requiredStage": 2,
+        "params": {
+          "spark": 55
+        }
+      }
+    },
+    {
+      "id": "ice_kirby",
+      "stage": 3,
+      "name": "アイスカービィ",
+      "title": "氷のスケーター",
+      "description": "冷たい息でカチンコチン！アイスクリームを食べてクールに変身！",
+      "themeColor": "#00bfff",
+      "spriteKey": "ice",
+      "conditions": {
+        "requiredStage": 2,
+        "params": {
+          "ice": 55
+        }
+      }
+    },
+    {
+      "id": "wizard_kirby",
+      "stage": 3,
+      "name": "ドクターカービィ",
+      "title": "天才ものしり博士",
+      "description": "メガネと知性で難問を解き明かす！キャンディを食べて知力UP！",
+      "themeColor": "#9370db",
+      "spriteKey": "wizard",
+      "conditions": {
+        "requiredStage": 2,
+        "params": {
+          "magic": 55
+        }
+      }
+    },
+    {
+      "id": "burning_sword_kirby",
+      "stage": 4,
+      "name": "バーニングソード",
+      "title": "炎と剣の合体奥義！",
+      "description": "【炎 × 剣】燃え盛る大剣を振るう最強の戦士！",
+      "themeColor": "#ff1493",
+      "spriteKey": "burning_sword",
+      "conditions": {
+        "requiredStage": 3,
+        "params": {
+          "fire": 55,
+          "slash": 80
+        }
+      }
+    },
+    {
+      "id": "spark_cutter_kirby",
+      "stage": 4,
+      "name": "スパークブレード",
+      "title": "雷光の神速剣！",
+      "description": "【剣 × 雷】プラズマの刃で光速の一撃を放つ！",
+      "themeColor": "#7fff00",
+      "spriteKey": "spark_cutter",
+      "conditions": {
+        "requiredStage": 3,
+        "params": {
+          "slash": 55,
+          "spark": 80
+        }
+      }
+    },
+    {
+      "id": "frost_spark_kirby",
+      "stage": 4,
+      "name": "フロストボム",
+      "title": "絶対零度の雷氷！",
+      "description": "【氷 × 雷】超電導の冷気爆弾で敵を凍結クラッシュ！",
+      "themeColor": "#00ffff",
+      "spriteKey": "frost_spark",
+      "conditions": {
+        "requiredStage": 3,
+        "params": {
+          "ice": 55,
+          "spark": 80
+        }
+      }
+    },
+    {
+      "id": "star_legend_kirby",
+      "stage": 4,
+      "name": "スターロッド・レジェンド",
+      "title": "星の勇者・究極形態",
+      "description": "【全属性完全制覇】すべての勉強を究めたカービィの奇跡の姿！夢の泉のスターロッドで希望の光を放つ！",
+      "themeColor": "#ffd700",
+      "spriteKey": "star_legend",
+      "conditions": {
+        "requiredStage": 3,
+        "params": {
+          "fire": 35,
+          "slash": 35,
+          "spark": 35,
+          "ice": 35,
+          "magic": 35
+        }
+      }
+    }
+  ]
+}

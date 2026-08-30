@@ -1,0 +1,74 @@
+{
+  "subject": "算数",
+  "grade": 5,
+  "unit": "小数・分数・割合・体積・図形",
+  "questions": [
+    {
+      "id": "math-5-01",
+      "type": "choice",
+      "monster": "waddle_dee",
+      "foodReward": "apple",
+      "question": "3/4 を小数で表すとどれになるかな？",
+      "options": ["0.34", "0.75", "0.43", "1.25"],
+      "answer": 1,
+      "hint": "3 ÷ 4 を計算してみよう！",
+      "explanation": "3 ÷ 4 ＝ 0.75 です。分数は「分子 ÷ 分母」で小数に直せます。"
+    },
+    {
+      "id": "math-5-02",
+      "type": "fill",
+      "monster": "bronto_burt",
+      "foodReward": "star_candy",
+      "question": "円周の長さを求める公式は「直径 × 【___】」です。（漢字3文字、または数字でおよそ3.14）",
+      "answer": "円周率",
+      "acceptable": ["円周率", "3.14", "えんしゅうりつ"],
+      "hint": "円のまわりの長さと直径の比率のことだよ！",
+      "explanation": "円周 ＝ 直径 × 円周率（およそ3.14）で求められます。"
+    },
+    {
+      "id": "math-5-03",
+      "type": "numeric",
+      "monster": "gordo",
+      "foodReward": "spark_soda",
+      "question": "縦4cm、横6cm、高さ5cmの直方体の体積は何cm³でしょう？（半角数字で入力）",
+      "answer": 120,
+      "unit": "cm³",
+      "hint": "直方体の体積 ＝ 縦 × 横 × 高さ",
+      "explanation": "4 × 6 × 5 ＝ 120 cm³ です。"
+    },
+    {
+      "id": "math-5-04",
+      "type": "passage",
+      "monster": "king_dedede",
+      "foodReward": "maxim_tomato",
+      "passage": "プププランドの果樹園では、去年は全体で400個のリンゴが収穫できました。今年は豊作で、去年の「1.3倍（130％）」のリンゴが収穫できました。また、収穫したリンゴのうち「25％（0.25）」をアップルパイ作りに使いました。",
+      "question": "今年収穫できたリンゴは全部で何個でしょう？",
+      "options": ["430個", "480個", "520個", "560個"],
+      "answer": 2,
+      "hint": "もとにする量（400個）× 割合（1.3）を計算しよう！",
+      "explanation": "400 × 1.3 ＝ 520 個です。割合は「もとにする量 × 割合」で求められます。"
+    },
+    {
+      "id": "math-5-05",
+      "type": "choice",
+      "monster": "waddle_dee",
+      "foodReward": "chili_curry",
+      "question": "三角形の3つの角の大きさの合計は何度かな？",
+      "options": ["90度", "180度", "270度", "360度"],
+      "answer": 1,
+      "hint": "四角形は360度。三角形はその半分だよ！",
+      "explanation": "どんな三角形でも3つの角の和は必ず180度になります。"
+    },
+    {
+      "id": "math-5-06",
+      "type": "numeric",
+      "monster": "gordo",
+      "foodReward": "ice_cream",
+      "question": "定価2000円のゲームソフトが「2割引（0.2引き）」で売られています。売値は何円でしょう？（半角数字で入力）",
+      "answer": 1600,
+      "unit": "円",
+      "hint": "2割引＝定価の8割（0.8倍）の値段だよ！",
+      "explanation": "2000 × (1 - 0.2) ＝ 2000 × 0.8 ＝ 1600 円です。"
+    }
+  ]
+}

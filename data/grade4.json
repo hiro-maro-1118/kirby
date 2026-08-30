@@ -1,0 +1,44 @@
+{
+  "grade": 4,
+  "questions": [
+    {
+      "id": "g4-math-01",
+      "subject": "算数",
+      "type": "choice",
+      "unit": "面積の計算",
+      "monster": "waddle_dee",
+      "foodReward": "sword_meat",
+      "question": "1辺が 5cm の正方形の面積は何cm²でしょう？",
+      "options": ["20cm²", "25cm²", "30cm²", "10cm²"],
+      "answer": 1,
+      "hint": "正方形の面積 ＝ 1辺 × 1辺",
+      "explanation": "5 × 5 ＝ 25 cm² です。"
+    },
+    {
+      "id": "g4-sci-01",
+      "subject": "理科",
+      "type": "choice",
+      "unit": "水のすがたと温度",
+      "monster": "gordo",
+      "foodReward": "ice_cream",
+      "question": "水が沸騰（ふっとう）して湯気になる温度はおよそ何度でしょう？",
+      "options": ["0度", "50度", "100度", "200度"],
+      "answer": 2,
+      "hint": "1気圧のもとでの沸点（ふってん）だよ！",
+      "explanation": "水は100度で沸騰して水蒸気（気体）になります。"
+    },
+    {
+      "id": "g4-soc-01",
+      "subject": "社会",
+      "type": "numeric",
+      "unit": "日本の都道府県",
+      "monster": "bronto_burt",
+      "foodReward": "chili_curry",
+      "question": "日本全国にある都道府県は全部でいくつあるでしょう？（半角数字で入力）",
+      "answer": 47,
+      "unit": "都道府県",
+      "hint": "1都1道2府43県だよ！",
+      "explanation": "日本には全部で47の都道府県があります。"
+    }
+  ]
+}

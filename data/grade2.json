@@ -1,0 +1,44 @@
+{
+  "grade": 2,
+  "questions": [
+    {
+      "id": "g2-math-01",
+      "subject": "算数",
+      "type": "choice",
+      "unit": "九九（かけ算）",
+      "monster": "waddle_dee",
+      "foodReward": "spark_soda",
+      "question": "「7 × 8」の答えはどれかな？",
+      "options": ["48", "54", "56", "63"],
+      "answer": 2,
+      "hint": "しち・は…",
+      "explanation": "7 × 8 ＝ 56（しちは ごじゅうろく）です。"
+    },
+    {
+      "id": "g2-math-02",
+      "subject": "算数",
+      "type": "numeric",
+      "unit": "長さのたんい",
+      "monster": "gordo",
+      "foodReward": "sword_meat",
+      "question": "1m（メートル）は何cm（センチメートル）でしょう？（数字で入力）",
+      "answer": 100,
+      "unit": "cm",
+      "hint": "1m ＝ 100cm だよ！",
+      "explanation": "1m は 100cm です。"
+    },
+    {
+      "id": "g2-jp-01",
+      "subject": "国語",
+      "type": "fill",
+      "unit": "かん字",
+      "monster": "bronto_burt",
+      "foodReward": "magic_candy",
+      "question": "文中の「はる」を漢字で書こう。\n「【___】休みにお花見へ行く。」（漢字1文字）",
+      "answer": "春",
+      "acceptable": ["春"],
+      "hint": "四季のひとつ（春・夏・秋・冬）だよ！",
+      "explanation": "「春（はる）」と書きます。"
+    }
+  ]
+}

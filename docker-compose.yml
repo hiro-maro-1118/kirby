@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  kirby-pet-study:
+    build: .
+    container_name: kirby-pet-app
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      # NAS上で問題データを編集・追加した際に即座に反映されるボリュームマウント
+      - ./data:/usr/share/nginx/html/data:ro
+    environment:
+      - TZ=Asia/Tokyo

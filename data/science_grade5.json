@@ -1,0 +1,40 @@
+{
+  "subject": "理科",
+  "grade": 5,
+  "unit": "植物の発芽・ふりこ・もののとけ方・天体",
+  "questions": [
+    {
+      "id": "sci-5-01",
+      "type": "choice",
+      "monster": "bronto_burt",
+      "foodReward": "spark_soda",
+      "question": "ふりこが1往復する時間は何によって決まるでしょう？",
+      "options": ["おもりの重さ", "ふれはばの大きさ", "ふりこの長さ", "おもりの色"],
+      "answer": 2,
+      "hint": "長さを変えると往復時間が変わるよ！",
+      "explanation": "ふりこの1往復の時間は「ふりこの長さ」だけで決まります（重さや振れ幅は関係ありません）。"
+    },
+    {
+      "id": "sci-5-02",
+      "type": "fill",
+      "monster": "waddle_dee",
+      "foodReward": "ice_cream",
+      "question": "植物の種子が発芽するために必要な3つの条件は「水」「空気（酸素）」と「適当な【___】」です。（漢字2文字）",
+      "answer": "温度",
+      "acceptable": ["温度", "おんど", "気温"],
+      "hint": "寒すぎても暑すぎても芽が出ないよ！",
+      "explanation": "発芽の3条件は「水」「空気」「適当な温度」です。日光や肥料は発芽後の成長に必要です。"
+    },
+    {
+      "id": "sci-5-03",
+      "type": "numeric",
+      "monster": "gordo",
+      "foodReward": "star_candy",
+      "question": "水100gに食塩を25gとかして作った食塩水全体の重さは何gでしょう？（半角数字で入力）",
+      "answer": 125,
+      "unit": "g",
+      "hint": "水にとけても見えなくなるだけで、重さは合計されるよ！",
+      "explanation": "水100g ＋ 食塩25g ＝ 125g です（質量保存の法則）。"
+    }
+  ]
+}

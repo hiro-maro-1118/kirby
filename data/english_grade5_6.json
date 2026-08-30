@@ -1,0 +1,76 @@
+{
+  "grade": 5,
+  "subject": "英語",
+  "questions": [
+    {
+      "id": "eng-5-01",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "日常のあいさつ",
+      "monster": "bronto_burt",
+      "foodReward": "magic_candy",
+      "question": "「おはようございます！」を英語で言うとどれかな？",
+      "options": ["Good morning!", "Good afternoon!", "Good evening!", "Good night!"],
+      "answer": 0,
+      "hint": "朝のあいさつだよ！",
+      "explanation": "朝のあいさつは「Good morning!」です。"
+    },
+    {
+      "id": "eng-5-02",
+      "subject": "英語",
+      "grade": 5,
+      "type": "fill",
+      "unit": "すきな食べ物",
+      "monster": "waddle_dee",
+      "foodReward": "apple",
+      "question": "「私はリンゴが好きです。」\nI like 【___】.（英語小文字で入力）",
+      "answer": "apples",
+      "acceptable": ["apples", "apple", "an apple"],
+      "hint": "リンゴのスペルをアルファベットで書こう！",
+      "explanation": "リンゴは英語で「apple（または一般的な複数形 apples）」です。"
+    },
+    {
+      "id": "eng-5-03",
+      "subject": "英語",
+      "grade": 5,
+      "type": "choice",
+      "unit": "曜日・月",
+      "monster": "gordo",
+      "foodReward": "spark_soda",
+      "question": "「Sunday」は何曜日でしょう？",
+      "options": ["月曜日", "水曜日", "金曜日", "日曜日"],
+      "answer": 3,
+      "hint": "太陽（Sun）の日だよ！",
+      "explanation": "Sunday は日曜日です。"
+    },
+    {
+      "id": "eng-6-01",
+      "subject": "英語",
+      "grade": 6,
+      "type": "passage",
+      "monster": "king_dedede",
+      "foodReward": "star_candy",
+      "passage": "Hello, my name is Kirby. I live in Pupupu Land. I like apples and cake. My favorite season is spring because many beautiful flowers bloom.",
+      "question": "What is Kirby's favorite season? (カービィの好きな季節は？)",
+      "options": ["Summer (夏)", "Fall (秋)", "Spring (春)", "Winter (冬)"],
+      "answer": 2,
+      "hint": "「My favorite season is ...」の部分を探そう！",
+      "explanation": "「My favorite season is spring (春)」と書いてあります。"
+    },
+    {
+      "id": "eng-6-02",
+      "subject": "英語",
+      "grade": 6,
+      "type": "choice",
+      "unit": "将来の夢",
+      "monster": "waddle_dee",
+      "foodReward": "sword_meat",
+      "question": "「I want to be a teacher.」の日本語の意味はどれ？",
+      "options": ["私は先生になりたいです。", "私は先生が好きです。", "私は学校に行きたいです。", "私は勉強しています。"],
+      "answer": 0,
+      "hint": "want to be 〜 で「〜になりたい」だよ！",
+      "explanation": "「I want to be a teacher.」＝「私は先生になりたいです。」です。"
+    }
+  ]
+}

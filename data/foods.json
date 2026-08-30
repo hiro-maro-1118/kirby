@@ -1,0 +1,108 @@
+{
+  "foods": [
+    {
+      "id": "apple",
+      "name": "リンゴ",
+      "icon": "🍎",
+      "description": "みずみずしくておいしい基本のごちそう",
+      "hunger": 10,
+      "happy": 5,
+      "params": {
+        "baseExp": 5
+      }
+    },
+    {
+      "id": "chili_curry",
+      "name": "からくちカレー",
+      "icon": "🍛",
+      "description": "スパイシーで激辛！体がカッカと燃え上がる！",
+      "hunger": 15,
+      "happy": 5,
+      "params": {
+        "fire": 5,
+        "baseExp": 5
+      }
+    },
+    {
+      "id": "sword_meat",
+      "name": "まんが肉",
+      "icon": "🍖",
+      "description": "骨付きのジューシーなお肉！パワーがみなぎる！",
+      "hunger": 20,
+      "happy": 10,
+      "params": {
+        "slash": 10,
+        "baseExp": 5
+      }
+    },
+    {
+      "id": "spark_soda",
+      "name": "でんげきソーダ",
+      "icon": "🥤",
+      "description": "シュワシュワ弾ける炭酸！飲むとパチパチ痺れる！",
+      "hunger": 10,
+      "happy": 7,
+      "params": {
+        "spark": 8,
+        "baseExp": 5
+      }
+    },
+    {
+      "id": "ice_cream",
+      "name": "ソフトクリーム",
+      "icon": "🍦",
+      "description": "ひんやり甘くて頭がキーンとするクールなデザート",
+      "hunger": 8,
+      "happy": 10,
+      "params": {
+        "ice": 10,
+        "baseExp": 5
+      }
+    },
+    {
+      "id": "magic_candy",
+      "name": "マジックキャンディ",
+      "icon": "🍬",
+      "description": "知恵とひらめきが湧き出る不思議な星型ドロップ",
+      "hunger": 10,
+      "happy": 30,
+      "params": {
+        "magic": 7,
+        "baseExp": 5
+      }
+    },
+    {
+      "id": "star_candy",
+      "name": "むてきキャンディ",
+      "icon": "🍭",
+      "description": "カラフルに光るキャンディ！全能力がアップする！",
+      "hunger": 9,
+      "happy": 20,
+      "params": {
+        "fire": 3,
+        "slash": 3,
+        "spark": 3,
+        "ice": 3,
+        "magic": 3,
+        "baseExp": 10
+      }
+    },
+    {
+      "id": "maxim_tomato",
+      "name": "マキシムトマト",
+      "icon": "🍅",
+      "description": "「M」の文字が輝く伝説のトマト！満腹度MAX＆超成長！",
+      "hunger": 100,
+      "happy": 100,
+      "params": {
+        "fire": 10,
+        "slash": 10,
+        "spark": 10,
+        "ice": 10,
+        "magic": 10,
+        "baseExp": 20,
+        "maximCount": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "kirby-pet-study",
+  "version": "1.0.0",
+  "description": "たまごっち風ドット絵カービィ育成×テスト復習Webアプリ",
+  "main": "index.html",
+  "scripts": {
+    "dev": "node serve.js",
+    "start": "node serve.js"
+  },
+  "keywords": ["kirby", "tamagotchi", "education", "quiz"],
+  "author": "",
+  "license": "MIT"
+}

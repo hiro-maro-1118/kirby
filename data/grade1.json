@@ -1,0 +1,44 @@
+{
+  "grade": 1,
+  "questions": [
+    {
+      "id": "g1-math-01",
+      "subject": "算数",
+      "type": "choice",
+      "unit": "1けたのたし算",
+      "monster": "waddle_dee",
+      "foodReward": "apple",
+      "question": "3 ＋ 4 は いくつかな？",
+      "options": ["5", "6", "7", "8"],
+      "answer": 2,
+      "hint": "ゆびをつかって かぞえてみよう！",
+      "explanation": "3 に 4 を たすと 7 になるよ！"
+    },
+    {
+      "id": "g1-math-02",
+      "subject": "算数",
+      "type": "numeric",
+      "unit": "1けたのひき算",
+      "monster": "bronto_burt",
+      "foodReward": "ice_cream",
+      "question": "10こ あった リンゴを 3こ たべました。のこりは なんこ？（すうじで にゅうりょく）",
+      "answer": 7,
+      "unit": "こ",
+      "hint": "10 － 3 を けいさんしよう！",
+      "explanation": "10 － 3 ＝ 7こ です。"
+    },
+    {
+      "id": "g1-jp-01",
+      "subject": "国語",
+      "type": "fill",
+      "unit": "ひらがな・ことば",
+      "monster": "waddle_dee",
+      "foodReward": "apple",
+      "question": "「いぬ」が ワンワン と 【___】。（なく / はしる）",
+      "answer": "なく",
+      "acceptable": ["なく", "なきます"],
+      "hint": "こえを だすことを なんていうかな？",
+      "explanation": "いぬは「ワンワンとなきます」。"
+    }
+  ]
+}

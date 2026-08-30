@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>星のカービィ べんきょう＆すいこみフレンズ</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⭐</text></svg>">
+</head>
+<body>
+
+  <div class="tamagotchi-device" id="tamagotchi">
+    <!-- デバイス上部ロゴ ＆ 管理画面リンク -->
+    <div class="device-header">
+      <span>⭐</span> PUPUPU FRIENDS <span>⭐</span>
+      <a href="./admin.html" class="admin-link-badge" title="親用問題管理ダッシュボード">⚙️ 管理</a>
+    </div>
+
+    <!-- 液晶ディスプレイ -->
+    <div class="screen-housing">
+      <div class="lcd-screen" id="lcdScreen">
+
+        <!-- ステータスバー（常時表示） -->
+        <div class="lcd-statusbar">
+          <div class="pet-indicators">
+            <span class="indicator" id="statHunger">🍖 100%</span>
+            <span class="indicator" id="statEnergy">💖 100%</span>
+            <span class="indicator" id="statPoop">💩 0</span>
+            <span class="indicator stamina-indicator" id="statStamina">⚡ 5/5</span>
+          </div>
+          <div id="statFormName">おむつカービィ</div>
+        </div>
+
+        <!-- 1. お部屋ホーム画面 (HOME) -->
+        <div class="view" id="viewHome">
+          <div class="room-stage">
+            <div class="poop-layer" id="poopLayer"></div>
+
+            <div class="pet-sprite-container" id="petMainSprite">
+              <div class="pet-bubble" id="petSpeechBubble">ぽよ！元気いっぱい！</div>
+              <div class="pet-sleep-zzz hidden" id="petSleepZzz">Z<span>z</span><span>z</span></div>
+              <div class="pet-star-effect hidden" id="petStarEffect">
+                <span>⭐</span><span>⭐</span><span>⭐</span>
+              </div>
+              <img id="petImg" src="./assets/sprites/pet_baby.webp" alt="Kirby">
+            </div>
+            <div class="pet-status-info">
+              <div class="stage-badge" id="badgeStage">第1形態: おむつ期</div>
+              <div id="petSubText">5問テストを解いてごちそうをゲットしよう！</div>
+            </div>
+          </div>
+          <div class="home-action-bar">
+            <button class="mini-action-btn" id="btnHomeClean">🧹 おそうじ</button>
+            <button class="mini-action-btn" id="btnHomeFeed">🍙 ごはん</button>
+            <button class="mini-action-btn" id="btnHomeStudy">✏️ 5問テスト</button>
+          </div>
+        </div>
+
+        <!-- 2. 学習メニュー選択画面 (STUDY MENU) -->
+        <div class="view hidden" id="viewStudyMenu">
+          <div class="grade-select-wrap">
+            <span>🎒 がくねん:</span>
+            <select id="selectGrade">
+              <option value="5" selected>小学5年生</option>
+              <option value="1">小学1年生</option>
+              <option value="2">小学2年生</option>
+              <option value="3">小学3年生</option>
+              <option value="4">小学4年生</option>
+              <option value="6">小学6年生</option>
+              <option value="all">🌟 ぜんがくねん</option>
+            </select>
+          </div>
+
+          <div class="choice-grid" id="studySubjectGrid">
+            <button class="choice-btn" data-subject="all">🌟 ぜんぶ（5問）</button>
+            <button class="choice-btn" data-subject="算数">📐 算数（5問）</button>
+            <button class="choice-btn" data-subject="国語">📖 国語（5問）</button>
+            <button class="choice-btn" data-subject="理科" id="btnSubjSci">🔬 理科（5問）</button>
+            <button class="choice-btn" data-subject="社会" id="btnSubjSoc">🗾 社会（5問）</button>
+            <button class="choice-btn" data-subject="英語" id="btnSubjEng" style="background:#e8f4fd;">🔤 英語 (小5・6)</button>
+            <button class="choice-btn" id="btnRevengeMode" style="background:#ffd5e5; grid-column: span 2;">🔥 にがてリベンジ (<span id="revengeCount">0</span>問)</button>
+          </div>
+        </div>
+
+        <!-- 3. すいこみクイズバトル画面 (BATTLE - 5問連続) -->
+        <div class="view hidden" id="viewBattle">
+          <div class="battle-header">
+            <span id="battleProgressBadge" class="progress-badge">第 1 / 5 問</span>
+            <span id="battleSubjectUnit">算数 / 小数と分数</span>
+            <span id="battleQType">4択</span>
+          </div>
+
+          <div class="battle-arena">
+            <img class="battle-pet-sprite" id="battlePetImg" src="./assets/sprites/pet_baby.webp" alt="Kirby">
+            <div class="battle-inhale-wind" id="battleInhaleWind"></div>
+            <img class="battle-enemy-sprite" id="battleEnemyImg" src="./assets/sprites/enemy_waddle_dee.webp" alt="Monster">
+          </div>
+
+          <div class="question-box" id="questionBox">
+            <div class="passage-text hidden" id="battlePassage"></div>
+            <div class="question-prompt" id="battleQuestionText">問題文がここに入ります</div>
+          </div>
+
+          <!-- 解答入力エリア（4択 / 穴埋め / 数字入力） -->
+          <div class="answers-area" id="answersArea"></div>
+
+          <!-- 各問の結果ダイアログ -->
+          <div class="result-dialog hidden" id="resultDialog">
+            <div class="result-title" id="resultTitle">大正解！すいこみ大成功！</div>
+            <div class="result-reward" id="resultReward">🎁 リンゴ をゲットした！</div>
+            <div class="result-explanation" id="resultExplanation">解説テキスト</div>
+            <button class="result-close-btn" id="btnResultNext">つぎの問題へ！ [A]</button>
+          </div>
+
+          <!-- 5問終了時の総合リザルト画面 -->
+          <div class="session-result-dialog hidden" id="sessionResultDialog">
+            <div class="session-result-header">
+              <h3 id="sessionResultTitle">🎉 5問テスト クリア！</h3>
+              <div class="session-score" id="sessionScoreText">5問中 5問 正解！</div>
+            </div>
+            <div class="session-rewards-box">
+              <div style="font-size:11px; font-weight:bold; margin-bottom:4px;">🎁 ゲットしたごちそう</div>
+              <div class="rewards-icon-list" id="sessionRewardsList"></div>
+            </div>
+            <button class="result-close-btn" id="btnSessionFinish">お部屋にもどる！ [A]</button>
+          </div>
+        </div>
+
+        <!-- 4. ごはん・おやつ画面 (FOOD) -->
+        <div class="view hidden" id="viewFood">
+          <div class="section-title">🍙 ごちそうをあげる</div>
+          <div class="food-list" id="foodList"></div>
+        </div>
+
+        <!-- 5. ずかん画面 (ZUKAN - 裏パラメータ非表示) -->
+        <div class="view hidden" id="viewZukan">
+          <div class="section-title">📖 コピー能力ずかん（タップで着せ替え）</div>
+          <div class="zukan-description-box" id="zukanDescriptionBox">
+            <div id="zukanSelectedTitle">能力をタップしてね</div>
+            <div id="zukanSelectedDesc" style="font-size:10px; color:#555;">食べたごはんでいろんな姿に変身するよ！</div>
+          </div>
+          <div class="zukan-grid" id="zukanGrid" style="margin-top:6px;"></div>
+        </div>
+
+        <!-- 死亡＆復活モーダル -->
+        <div class="revive-modal hidden" id="reviveModal">
+          <img class="revive-ghost-img" src="./assets/sprites/pet_ghost.webp" alt="Ghost Kirby">
+          <h3 style="color:#ff6b6b; font-size:15px;">💀 カービィが死んでしまった…</h3>
+          <p style="font-size:11px; margin-top:4px; line-height:1.4;">
+            お世話を忘れて病気のまま時間がたってしまいました。<br>
+            マキシムトマトを使って生まれ変わらせよう！
+          </p>
+          <div class="revive-btn-group">
+            <button class="revive-action-btn" id="btnReviveUseTomato">🍅 マキシムトマトで復活！</button>
+            <button class="revive-action-btn" id="btnReviveQuiz" style="background:#4361ee;">✨ 復活クイズに挑戦する！</button>
+          </div>
+        </div>
+
+        <!-- 進化演出オーバーレイ -->
+        <div class="evolution-overlay hidden" id="evoOverlay">
+          <div class="evo-title">✨ しんか おめでとう！ ✨</div>
+          <img class="evo-sprite" id="evoSprite" src="./assets/sprites/pet_normal.webp" alt="Evolution">
+          <div class="evo-name" id="evoName">普通カービィ</div>
+          <p style="font-size:11px; color:#555; margin-top:4px;">(タップして閉じる)</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3つのたまごっちハードウェア操作ボタン -->
+    <div class="device-controls">
+      <div class="btn-wrapper">
+        <button class="retro-btn btn-a" id="btnA">A</button>
+        <span class="btn-label">けってい/お世話</span>
+      </div>
+      <div class="btn-wrapper">
+        <button class="retro-btn btn-b" id="btnB">B</button>
+        <span class="btn-label">もどる/ホーム</span>
+      </div>
+      <div class="btn-wrapper">
+        <button class="retro-btn btn-c" id="btnC">C</button>
+        <span class="btn-label">メニュー</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
