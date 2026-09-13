@@ -1,10 +1,12 @@
 import os
+import math
 from PIL import Image, ImageDraw
 
 os.makedirs("assets/sprites", exist_ok=True)
 
-SCALE = 4  # 32x32 -> 128x128
-SIZE = 32
+# 64x64 pixel grid scaled up to 256x256 for crisp high-definition pixel art
+SIZE = 64
+SCALE = 4
 
 def create_frame():
     return Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
@@ -34,877 +36,1443 @@ def scale_and_save_webp(frames, filename, duration=180):
     )
     print(f"Generated {filename}")
 
-# --- Helper Draw Routines ---
-PINK = (255, 140, 180, 255)
-PINK_SHADOW = (225, 95, 140, 255)
-PINK_HIGHLIGHT = (255, 190, 215, 255)
-RED_FEET = (235, 30, 75, 255)
-RED_FEET_SHADOW = (180, 15, 50, 255)
-BLACK = (20, 20, 25, 255)
+# --- Rich & Cute Color Palette ---
+PINK_LIGHT = (255, 215, 235, 255)
+PINK_BODY = (255, 145, 185, 255)
+PINK_SHADOW = (235, 95, 145, 255)
+PINK_DEEP = (195, 55, 110, 255)
+OUTLINE = (45, 25, 40, 255)
+
+RED_FEET = (235, 40, 80, 255)
+RED_FEET_LIGHT = (255, 80, 120, 255)
+RED_FEET_SHADOW = (175, 20, 60, 255)
+
 WHITE = (255, 255, 255, 255)
-CHEEK = (255, 80, 130, 255)
-DIAPER_WHITE = (245, 245, 250, 255)
-DIAPER_SHADOW = (195, 200, 215, 255)
-DIAPER_PIN = (255, 215, 0, 255)
+BLACK = (25, 20, 30, 255)
+CHEEK_COLOR = (255, 80, 140, 255)
+CHEEK_LIGHT = (255, 140, 185, 255)
 
-def draw_base_body(px, cx, cy, radius, bob=0, squash=0):
-    """Draw circular Kirby body with outline and shading"""
-    rx = int(radius + squash)
-    ry = int(radius - squash)
-    for y in range(cy - ry - 2, cy + ry + 3):
-        for x in range(cx - rx - 2, cx + rx + 3):
-            dx = (x - cx) / radius
-            dy = (y - cy) / radius
+EYE_BLUE_TOP = (15, 30, 75, 255)
+EYE_BLUE_MID = (30, 85, 185, 255)
+EYE_BLUE_BOT = (75, 165, 245, 255)
+EYE_BLUE_CYAN = (130, 215, 255, 255)
+
+MOUTH_DARK = (160, 25, 60, 255)
+MOUTH_TONGUE = (255, 120, 150, 255)
+
+# --- Drawing Utilities ---
+
+def fill_circle(px, cx, cy, radius, color):
+    r_int = int(radius + 1)
+    for y in range(int(cy - r_int), int(cy + r_int + 1)):
+        for x in range(int(cx - r_int), int(cx + r_int + 1)):
+            if (x - cx)**2 + (y - cy)**2 <= radius**2:
+                px[(x, y)] = color
+
+def fill_ellipse(px, cx, cy, rx, ry, color):
+    rx_int = int(rx + 1)
+    ry_int = int(ry + 1)
+    for y in range(int(cy - ry_int), int(cy + ry_int + 1)):
+        for x in range(int(cx - rx_int), int(cx + rx_int + 1)):
+            if ((x - cx) / rx)**2 + ((y - cy) / ry)**2 <= 1.0:
+                px[(x, y)] = color
+
+def draw_shaded_body(px, cx, cy, radius=16, squash_x=0, squash_y=0):
+    rx = radius + squash_x
+    ry = radius + squash_y
+    
+    for y in range(int(cy - ry - 2), int(cy + ry + 3)):
+        for x in range(int(cx - rx - 2), int(cx + rx + 3)):
+            dx = (x - cx) / rx
+            dy = (y - cy) / ry
             dist_sq = dx * dx + dy * dy
+            
             if dist_sq <= 1.0:
-                # Main body
-                if dx < -0.3 and dy < -0.3:
-                    px[(x, y)] = PINK_HIGHLIGHT
-                elif dy > 0.4 or dx > 0.4:
-                    px[(x, y)] = PINK_SHADOW
+                if dx < -0.25 and dy < -0.25 and dist_sq > 0.25:
+                    px[(x, y)] = PINK_LIGHT
+                elif dy > 0.4 or (dx > 0.45 and dy > 0.1):
+                    if dist_sq > 0.85:
+                        px[(x, y)] = PINK_DEEP
+                    else:
+                        px[(x, y)] = PINK_SHADOW
                 else:
-                    px[(x, y)] = PINK
-            elif dist_sq <= 1.25:
-                # Outline
-                px[(x, y)] = BLACK
+                    px[(x, y)] = PINK_BODY
+            elif dist_sq <= 1.18:
+                px[(x, y)] = OUTLINE
 
-def draw_eyes_and_cheeks(px, cx, cy, blink=False, happy=False):
-    if blink:
-        # Closed smiling eyes
-        for dx in [-3, -2, -1]:
-            px[(cx + dx, cy - 1)] = BLACK
-        for dx in [1, 2, 3]:
-            px[(cx + dx, cy - 1)] = BLACK
-    elif happy:
-        # Happy arched eyes ^^
-        px[(cx - 3, cy - 1)] = BLACK
-        px[(cx - 2, cy - 2)] = BLACK
-        px[(cx - 1, cy - 1)] = BLACK
-        px[(cx + 1, cy - 1)] = BLACK
-        px[(cx + 2, cy - 2)] = BLACK
-        px[(cx + 3, cy - 1)] = BLACK
-    else:
-        # Standard Kirby oval eyes with highlight
-        # Left eye
-        px[(cx - 3, cy - 3)] = BLACK
-        px[(cx - 2, cy - 3)] = BLACK
-        px[(cx - 3, cy - 2)] = WHITE  # Highlight
-        px[(cx - 2, cy - 2)] = BLACK
-        px[(cx - 3, cy - 1)] = (30, 80, 180, 255) # Blue eye base
-        px[(cx - 2, cy - 1)] = BLACK
-        px[(cx - 3, cy)] = BLACK
-        px[(cx - 2, cy)] = BLACK
+def draw_cute_eyes(px, cx, cy, eye_state='normal'):
+    """
+    Proportional, beautifully curved oval eyes (原作準拠の愛らしくスッキリした楕円の瞳)
+    """
+    if eye_state == 'blink':
+        # Smooth arched closed eyes ^ ^
+        for dx in range(-6, -2):
+            arc = int((2.5 - abs(dx + 4)) * 0.8)
+            px[(cx + dx, cy - 2 - arc)] = OUTLINE
+            px[(cx + dx, cy - 1 - arc)] = OUTLINE
+        for dx in range(2, 6):
+            arc = int((2.5 - abs(dx - 4)) * 0.8)
+            px[(cx + dx, cy - 2 - arc)] = OUTLINE
+            px[(cx + dx, cy - 1 - arc)] = OUTLINE
 
-        # Right eye
-        px[(cx + 2, cy - 3)] = BLACK
-        px[(cx + 3, cy - 3)] = BLACK
-        px[(cx + 2, cy - 2)] = WHITE  # Highlight
-        px[(cx + 3, cy - 2)] = BLACK
-        px[(cx + 2, cy - 1)] = (30, 80, 180, 255)
-        px[(cx + 3, cy - 1)] = BLACK
-        px[(cx + 2, cy)] = BLACK
-        px[(cx + 3, cy)] = BLACK
+    elif eye_state == 'happy':
+        # Cheerful rainbow crescent eyes ^^
+        for dx in range(-6, -1):
+            arc = int(1.8 * (1.0 - ((dx + 3.5) / 2.5)**2))
+            px[(cx + dx, cy - 1 - arc)] = OUTLINE
+            px[(cx + dx, cy - arc)] = OUTLINE
+        for dx in range(1, 6):
+            arc = int(1.8 * (1.0 - ((dx - 3.5) / 2.5)**2))
+            px[(cx + dx, cy - 1 - arc)] = OUTLINE
+            px[(cx + dx, cy - arc)] = OUTLINE
 
-    # Cheeks
-    px[(cx - 5, cy + 1)] = CHEEK
-    px[(cx - 4, cy + 1)] = CHEEK
-    px[(cx + 4, cy + 1)] = CHEEK
-    px[(cx + 5, cy + 1)] = CHEEK
+    elif eye_state == 'sick':
+        # Dizzy spiral eyes (Compact)
+        for dx, dy in [(-5, -3), (-4, -4), (-3, -3), (-3, -2), (-4, -1), (-5, -2)]:
+            px[(cx + dx, cy + dy)] = OUTLINE
+        for dx, dy in [(5, -3), (4, -4), (3, -3), (3, -2), (4, -1), (5, -2)]:
+            px[(cx + dx, cy + dy)] = OUTLINE
 
-    # Small mouth
-    if happy:
-        px[(cx - 1, cy + 2)] = (200, 30, 50, 255)
-        px[(cx, cy + 2)] = (240, 60, 80, 255)
-        px[(cx + 1, cy + 2)] = (200, 30, 50, 255)
-        px[(cx, cy + 3)] = BLACK
-    else:
-        px[(cx, cy + 2)] = BLACK
+    else: # 'normal' or 'sparkle'
+        # Perfectly Proportioned Oval Eyes (Faithful to Kirby proportions)
+        eye_rx = 1.75
+        eye_ry = 3.6
+        
+        # Left Eye Center: (cx - 4.5, cy - 2.5)
+        # Right Eye Center: (cx + 4.5, cy - 2.5)
+        for (ecx, is_left) in [(cx - 4.5, True), (cx + 4.5, False)]:
+            ecy = cy - 2.5
+            
+            # 1. Draw Eye Outline & Iris (Oval)
+            for y in range(int(ecy - eye_ry - 2), int(ecy + eye_ry + 3)):
+                for x in range(int(ecx - eye_rx - 2), int(ecx + eye_rx + 3)):
+                    ndx = (x - ecx) / eye_rx
+                    ndy = (y - ecy) / eye_ry
+                    dist = ndx * ndx + ndy * ndy
+                    
+                    if dist <= 1.0:
+                        # Inner Iris with Smooth Gradient
+                        if ndy < -0.1:
+                            px[(x, y)] = EYE_BLUE_TOP
+                        elif ndy < 0.35:
+                            px[(x, y)] = EYE_BLUE_MID
+                        elif ndy < 0.75:
+                            px[(x, y)] = EYE_BLUE_BOT
+                        else:
+                            px[(x, y)] = EYE_BLUE_CYAN
+                    elif dist <= 1.38:
+                        # Smooth curved outline
+                        px[(x, y)] = OUTLINE
 
-def draw_feet(px, cx, cy, f_offset=0):
+            # 2. Main Top Highlight (Crisp oval shine)
+            hl_x = ecx - (0.4 if is_left else 0.3)
+            hl_y = ecy - 1.6
+            fill_ellipse(px, hl_x, hl_y, 0.95, 1.45, WHITE)
+
+            # 3. Bottom Secondary Sparkle (Subtle eye glint)
+            gl_x = int(ecx + (0.5 if is_left else 0.5))
+            gl_y = int(ecy + 1.8)
+            px[(gl_x, gl_y)] = WHITE
+            px[(gl_x - 1, gl_y)] = EYE_BLUE_CYAN
+
+def draw_cheeks_and_mouth(px, cx, cy, mouth_type='smile'):
+    # Cheeks (Smooth Blushing Oval)
+    fill_ellipse(px, cx - 10.5, cy + 2.0, 2.8, 1.8, CHEEK_COLOR)
+    px[(int(cx - 10.5), int(cy + 1.5))] = CHEEK_LIGHT
+    
+    fill_ellipse(px, cx + 10.5, cy + 2.0, 2.8, 1.8, CHEEK_COLOR)
+    px[(int(cx + 10.5), int(cy + 1.5))] = CHEEK_LIGHT
+
+    # Mouth
+    if mouth_type == 'smile':
+        # Rounded open smile :3
+        fill_ellipse(px, cx, cy + 3.8, 2.2, 1.6, MOUTH_TONGUE)
+        for a in range(0, 181, 30):
+            rad = math.radians(a)
+            mx = int(cx + 2.4 * math.cos(rad))
+            my = int(cy + 3.8 + 1.8 * math.sin(rad))
+            px[(mx, my)] = OUTLINE
+
+    elif mouth_type == 'open':
+        # Cheerful open mouth with tongue
+        fill_ellipse(px, cx, cy + 4.8, 2.6, 2.2, MOUTH_DARK)
+        fill_ellipse(px, cx, cy + 5.6, 1.8, 1.2, MOUTH_TONGUE)
+        for a in range(0, 360, 30):
+            rad = math.radians(a)
+            px[(int(cx + 2.8 * math.cos(rad)), int(cy + 4.8 + 2.4 * math.sin(rad)))] = OUTLINE
+
+    elif mouth_type == 'eating':
+        fill_ellipse(px, cx, cy + 4.5, 3.5, 2.0, MOUTH_DARK)
+        fill_ellipse(px, cx, cy + 5.2, 2.0, 1.2, MOUTH_TONGUE)
+        px[(cx - 4, cy + 4)] = OUTLINE
+        px[(cx + 4, cy + 4)] = OUTLINE
+
+    elif mouth_type == 'inhale':
+        fill_circle(px, cx, cy + 4.5, 8.5, MOUTH_DARK)
+        fill_circle(px, cx, cy + 6.5, 5.5, (100, 10, 40, 255))
+        for a in range(0, 360, 15):
+            rad = math.radians(a)
+            px[(int(cx + 9.0 * math.cos(rad)), int(cy + 4.5 + 9.0 * math.sin(rad)))] = OUTLINE
+
+def draw_feet(px, cx, cy, f_left_offset=(0,0), f_right_offset=(0,0)):
     # Left foot
-    for fx in range(cx - 8, cx - 3):
-        for fy in range(cy + 6 + f_offset, cy + 10 + f_offset):
-            px[(fx, fy)] = RED_FEET
-    px[(cx - 9, cy + 8 + f_offset)] = BLACK
-    px[(cx - 3, cy + 9 + f_offset)] = RED_FEET_SHADOW
+    lx, ly = cx - 10 + f_left_offset[0], cy + 13 + f_left_offset[1]
+    for y in range(int(ly - 4), int(ly + 6)):
+        for x in range(int(lx - 7), int(lx + 8)):
+            dist = (x - lx)**2 / 38.0 + (y - ly)**2 / 18.0
+            if dist <= 1.0:
+                if y < ly: px[(x, y)] = RED_FEET_LIGHT
+                elif y > ly + 2: px[(x, y)] = RED_FEET_SHADOW
+                else: px[(x, y)] = RED_FEET
+            elif dist <= 1.25:
+                px[(x, y)] = OUTLINE
 
     # Right foot
-    for fx in range(cx + 3, cx + 8):
-        for fy in range(cy + 6 - f_offset, cy + 10 - f_offset):
-            px[(fx, fy)] = RED_FEET
-    px[(cx + 8, cy + 8 - f_offset)] = BLACK
-    px[(cx + 3, cy + 9 - f_offset)] = RED_FEET_SHADOW
+    rx, ry = cx + 10 + f_right_offset[0], cy + 13 + f_right_offset[1]
+    for y in range(int(ry - 4), int(ry + 6)):
+        for x in range(int(rx - 7), int(rx + 8)):
+            dist = (x - rx)**2 / 38.0 + (y - ry)**2 / 18.0
+            if dist <= 1.0:
+                if y < ry: px[(x, y)] = RED_FEET_LIGHT
+                elif y > ry + 2: px[(x, y)] = RED_FEET_SHADOW
+                else: px[(x, y)] = RED_FEET
+            elif dist <= 1.25:
+                px[(x, y)] = OUTLINE
 
-def draw_hands(px, cx, cy, h_up=False):
-    if h_up:
-        # Hands cheering up
-        for hx in range(cx - 9, cx - 6):
-            for hy in range(cy - 4, cy):
-                px[(hx, hy)] = PINK
-        for hx in range(cx + 6, cx + 9):
-            for hy in range(cy - 4, cy):
-                px[(hx, hy)] = PINK
-        px[(cx - 10, cy - 2)] = BLACK
-        px[(cx + 9, cy - 2)] = BLACK
+def draw_hands(px, cx, cy, hand_pose='normal', bounce=0):
+    if hand_pose == 'cheer':
+        fill_circle(px, cx - 15, cy - 5 + bounce, 4.5, PINK_BODY)
+        px[(cx - 15, cy - 7 + bounce)] = PINK_LIGHT
+        for a in range(0, 360, 20):
+            rad = math.radians(a)
+            px[(int(cx - 15 + 5 * math.cos(rad)), int(cy - 5 + bounce + 5 * math.sin(rad)))] = OUTLINE
+
+        fill_circle(px, cx + 15, cy - 5 - bounce, 4.5, PINK_BODY)
+        px[(cx + 15, cy - 7 - bounce)] = PINK_LIGHT
+        for a in range(0, 360, 20):
+            rad = math.radians(a)
+            px[(int(cx + 15 + 5 * math.cos(rad)), int(cy - 5 - bounce + 5 * math.sin(rad)))] = OUTLINE
     else:
-        # Hands resting at side
-        for hx in range(cx - 9, cx - 6):
-            for hy in range(cy + 1, cy + 4):
-                px[(hx, hy)] = PINK
-        for hx in range(cx + 6, cx + 9):
-            for hy in range(cy + 1, cy + 4):
-                px[(hx, hy)] = PINK
+        fill_circle(px, cx - 15, cy + 3 + bounce, 4.5, PINK_BODY)
+        px[(cx - 15, cy + 1 + bounce)] = PINK_LIGHT
+        for a in range(0, 360, 20):
+            rad = math.radians(a)
+            px[(int(cx - 15 + 5 * math.cos(rad)), int(cy + 3 + bounce + 5 * math.sin(rad)))] = OUTLINE
 
+        fill_circle(px, cx + 15, cy + 3 - bounce, 4.5, PINK_BODY)
+        px[(cx + 15, cy + 1 - bounce)] = PINK_LIGHT
+        for a in range(0, 360, 20):
+            rad = math.radians(a)
+            px[(int(cx + 15 + 5 * math.cos(rad)), int(cy + 3 - bounce + 5 * math.sin(rad)))] = OUTLINE
+
+
+# ==========================================
 # 1. おむつカービィ (Baby Kirby)
+# ==========================================
 def generate_baby_kirby():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 17
-        bob = 1 if frame_idx in [1, 3] else 0
-        blink = (frame_idx == 2)
+        cx, cy = 32, 34
+        bob = -1 if f in [1, 3] else 1
+        crawl = 2 if f % 2 == 0 else -2
+        blink = (f == 2)
         
-        # Small baby body
-        draw_base_body(px, cx, cy + bob, radius=6.5, bob=bob)
-        
-        # Diaper (おむつ)
-        for dy in range(cy + 2 + bob, cy + 7 + bob):
-            for dx in range(cx - 6, cx + 7):
-                if (dx - cx)**2 + (dy - (cy + bob))**2 <= 6.8**2:
-                    if dy >= cy + 3 + bob:
-                        px[(dx, dy)] = DIAPER_WHITE
-                        if dy == cy + 6 + bob:
-                            px[(dx, dy)] = DIAPER_SHADOW
-        # Diaper pin / badge
-        px[(cx - 3, cy + 4 + bob)] = DIAPER_PIN
-        px[(cx - 2, cy + 4 + bob)] = (255, 165, 0, 255)
+        draw_feet(px, cx, cy + bob, (-3 + crawl, 1), (3 - crawl, 1))
+        draw_shaded_body(px, cx, cy + bob, radius=14)
 
-        # Baby eyes (bigger/rounder)
-        if blink:
-            for dx in [-2, -1]: px[(cx + dx, cy - 1 + bob)] = BLACK
-            for dx in [1, 2]: px[(cx + dx, cy - 1 + bob)] = BLACK
-        else:
-            px[(cx - 2, cy - 2 + bob)] = WHITE
-            px[(cx - 2, cy - 1 + bob)] = BLACK
-            px[(cx - 2, cy + bob)] = (50, 100, 220, 255)
-            px[(cx + 2, cy - 2 + bob)] = WHITE
-            px[(cx + 2, cy - 1 + bob)] = BLACK
-            px[(cx + 2, cy + bob)] = (50, 100, 220, 255)
-        
-        # Pacifier (おしゃぶり) or baby cheeks
-        px[(cx - 4, cy + 1 + bob)] = CHEEK
-        px[(cx + 4, cy + 1 + bob)] = CHEEK
-        # Yellow pacifier ring
-        px[(cx - 1, cy + 1 + bob)] = (255, 230, 50, 255)
-        px[(cx, cy + 1 + bob)] = (255, 200, 0, 255)
-        px[(cx + 1, cy + 1 + bob)] = (255, 230, 50, 255)
-        px[(cx, cy + 2 + bob)] = (255, 140, 0, 255)
+        # Diaper
+        for y in range(cy + 4 + bob, cy + 16 + bob):
+            for x in range(cx - 13, cx + 14):
+                if (x - cx)**2 + (y - (cy + bob))**2 <= 14**2:
+                    if y >= cy + 6 + bob:
+                        px[(x, y)] = (255, 255, 255, 255)
+                        if y >= cy + 13 + bob or abs(x - cx) >= 11:
+                            px[(x, y)] = (215, 225, 240, 255)
+        for x in range(cx - 12, cx + 13):
+            if (x - cx)**2 + (cy + 6 + bob - (cy + bob))**2 <= 14**2:
+                px[(x, cy + 6 + bob)] = (180, 195, 220, 255)
 
-        # Tiny baby feet crawling
-        f_crawl = 1 if frame_idx in [1, 2] else -1
-        px[(cx - 5 + f_crawl, cy + 7 + bob)] = RED_FEET
-        px[(cx + 5 - f_crawl, cy + 7 + bob)] = RED_FEET
+        # Diaper Star Pin
+        pin_x, pin_y = cx - 6, cy + 9 + bob
+        fill_circle(px, pin_x, pin_y, 2.5, (255, 220, 40, 255))
+        px[(pin_x, pin_y)] = (255, 255, 180, 255)
+
+        # Big Cute Rounded Eyes
+        draw_cute_eyes(px, cx, cy - 2 + bob, 'blink' if blink else 'normal')
+        
+        # Pacifier
+        pac_y = cy + 4 + bob
+        fill_circle(px, cx, pac_y, 4, (255, 210, 50, 255))
+        fill_circle(px, cx, pac_y, 2, (255, 140, 20, 255))
+        px[(cx, pac_y + 3)] = (255, 240, 100, 255)
+
+        # Cheeks
+        fill_ellipse(px, cx - 10, cy + bob + 1, 2.5, 1.8, CHEEK_COLOR)
+        fill_ellipse(px, cx + 10, cy + bob + 1, 2.5, 1.8, CHEEK_COLOR)
+
+        # Baby crawl hands
+        fill_circle(px, cx - 11, cy + 10 + bob, 3.5, PINK_BODY)
+        fill_circle(px, cx + 11, cy + 10 + bob, 3.5, PINK_BODY)
 
         draw_pixels(img, px)
         frames.append(img)
     scale_and_save_webp(frames, "assets/sprites/pet_baby.webp", 200)
 
+
+# ==========================================
 # 2. 普通カービィ (Normal Kirby)
+# ==========================================
 def generate_normal_kirby():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        bob = -1 if frame_idx in [1, 2] else 0
-        blink = (frame_idx == 3)
-        squash = 1 if frame_idx == 0 else 0
-
-        draw_feet(px, cx, cy + bob, f_offset=bob)
-        draw_base_body(px, cx, cy + bob, radius=7.5, squash=squash)
-        draw_hands(px, cx, cy + bob, h_up=(frame_idx == 2))
-        draw_eyes_and_cheeks(px, cx, cy + bob, blink=blink, happy=(frame_idx == 2))
+        cx, cy = 32, 32
+        bob = -2 if f in [1, 2] else 0
+        blink = (f == 3)
+        happy = (f == 2)
+        
+        draw_feet(px, cx, cy + bob, (-1 if f==1 else 0, bob), (1 if f==2 else 0, bob))
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_hands(px, cx, cy + bob, 'cheer' if happy else 'normal', bounce=1 if f%2==1 else 0)
+        draw_cute_eyes(px, cx, cy + bob, 'blink' if blink else ('happy' if happy else 'normal'))
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'open' if happy else 'smile')
 
         draw_pixels(img, px)
         frames.append(img)
     scale_and_save_webp(frames, "assets/sprites/pet_normal.webp", 180)
 
-# 3. 単能力：ファイア (Fire Kirby)
+
+# ==========================================
+# 3. ファイアカービィ (Fire Kirby)
+# ==========================================
 def generate_fire_kirby():
     frames = []
-    for frame_idx in range(4):
+    flame_colors = [(255, 60, 20, 255), (255, 140, 20, 255), (255, 230, 40, 255), (255, 255, 180, 255)]
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 17
-        bob = -1 if frame_idx in [1, 2] else 0
+        cx, cy = 32, 34
+        bob = -1 if f in [1, 2] else 0
         
         draw_feet(px, cx, cy + bob)
-        draw_base_body(px, cx, cy + bob, radius=7.5)
-        draw_hands(px, cx, cy + bob)
-        draw_eyes_and_cheeks(px, cx, cy + bob, happy=True)
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_hands(px, cx, cy + bob, 'cheer', bounce=1)
+        draw_cute_eyes(px, cx, cy + bob, 'sparkle')
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'open')
 
-        # Fire crown / Flaming headgear
-        flame_colors = [(255, 50, 0, 255), (255, 140, 0, 255), (255, 230, 0, 255)]
-        shift = frame_idx % 2
-        for fy in range(cy - 12 + bob, cy - 6 + bob):
-            for fx in range(cx - 5, cx + 6):
-                dist = abs(fx - cx) + abs(fy - (cy - 10 + bob))
-                if dist <= 4 + shift:
-                    c = flame_colors[(fy + fx + frame_idx) % len(flame_colors)]
-                    px[(fx, fy)] = c
-        # Crown base
-        for fx in range(cx - 6, cx + 7):
-            px[(fx, cy - 6 + bob)] = (180, 30, 0, 255)
-            px[(fx, cy - 7 + bob)] = (255, 100, 0, 255)
+        # Gold Crown Band
+        for y in range(cy - 16 + bob, cy - 11 + bob):
+            for x in range(cx - 13, cx + 14):
+                if (x - cx)**2 <= 14**2:
+                    px[(x, y)] = (255, 215, 0, 255)
+        fill_circle(px, cx, cy - 13 + bob, 2.5, (230, 20, 40, 255))
+        px[(cx, cy - 14 + bob)] = WHITE
+
+        # Dynamic Roaring Flames
+        for fy in range(cy - 30 + bob, cy - 15 + bob):
+            h_ratio = (cy - 15 + bob - fy) / 15.0
+            max_w = int(14 * (1.0 - h_ratio * 0.7))
+            for fx in range(cx - max_w, cx + max_w + 1):
+                wave = int(math.sin(fy * 0.5 + f * 1.5) * 3)
+                if abs(fx - cx + wave) <= max_w:
+                    dist = (abs(fx - cx) / max(1, max_w)) + (h_ratio * 0.5)
+                    if dist < 0.35: px[(fx, fy)] = flame_colors[3]
+                    elif dist < 0.65: px[(fx, fy)] = flame_colors[2]
+                    elif dist < 0.95: px[(fx, fy)] = flame_colors[1]
+                    else: px[(fx, fy)] = flame_colors[0]
 
         draw_pixels(img, px)
         frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/pet_fire.webp", 160)
+    scale_and_save_webp(frames, "assets/sprites/pet_fire.webp", 150)
 
-# 4. 単能力：ソード (Sword Kirby)
+
+# ==========================================
+# 4. ソードカービィ (Sword Kirby)
+# ==========================================
 def generate_sword_kirby():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        bob = -1 if frame_idx in [1, 2] else 0
-
+        cx, cy = 30, 34
+        bob = -1 if f in [1, 2] else 0
+        blink = (f == 3)
+        
         draw_feet(px, cx, cy + bob)
-        draw_base_body(px, cx, cy + bob, radius=7.5)
-        draw_eyes_and_cheeks(px, cx, cy + bob)
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_cute_eyes(px, cx, cy + bob, 'blink' if blink else 'normal')
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'smile')
 
-        # Green Link-style Cap
-        for cy_cap in range(cy - 11 + bob, cy - 5 + bob):
-            for cx_cap in range(cx - 6, cx + 7):
-                if cx_cap <= cx + (cy - 5 + bob - cy_cap) * 2 - 2:
-                    px[(cx_cap, cy_cap)] = (34, 139, 34, 255)
-                    if cy_cap == cy - 6 + bob:
-                        px[(cx_cap, cy_cap)] = (0, 100, 0, 255)
-        # Cap tip drooping right
-        px[(cx + 7, cy - 6 + bob + frame_idx % 2)] = (50, 180, 50, 255)
-        px[(cx + 8, cy - 5 + bob + frame_idx % 2)] = (50, 180, 50, 255)
-        px[(cx + 9, cy - 4 + bob + frame_idx % 2)] = (255, 215, 0, 255) # Yellow pompom
+        # Green Knight Cap
+        cap_green = (40, 160, 50, 255)
+        cap_dark = (25, 105, 30, 255)
+        cap_light = (75, 205, 80, 255)
+        
+        for y in range(cy - 26 + bob, cy - 10 + bob):
+            for x in range(cx - 14, cx + 15):
+                dist_top = cy - 10 + bob - y
+                target_cx = cx + int(dist_top * 0.7)
+                w = max(2, int(15 - dist_top * 0.6))
+                if abs(x - target_cx) <= w:
+                    if y == cy - 11 + bob or x == cx - 14: px[(x, y)] = cap_dark
+                    elif y <= cy - 22 + bob or x == target_cx - w + 1: px[(x, y)] = cap_light
+                    else: px[(x, y)] = cap_green
+        
+        # Yellow pompom
+        fill_circle(px, cx + 16, cy - 22 + bob + (f % 2), 3, (255, 225, 50, 255))
 
-        # Sword in hand
-        sw_y = cy - 2 + bob
-        # Blade
-        for i in range(7):
-            px[(cx + 8 + i//2, sw_y - i)] = (220, 230, 255, 255)
-            px[(cx + 9 + i//2, sw_y - i)] = (180, 200, 230, 255)
-        # Hilt
-        px[(cx + 7, sw_y + 1)] = (255, 215, 0, 255)
-        px[(cx + 8, sw_y + 1)] = (160, 82, 45, 255)
-        px[(cx + 9, sw_y + 1)] = (255, 215, 0, 255)
+        # Silver Sword in Hand
+        sword_base_x = cx + 18
+        sword_base_y = cy + 2 + bob
+        fill_circle(px, cx + 16, cy + 2 + bob, 4.5, PINK_BODY)
+        for gy in range(sword_base_y - 3, sword_base_y + 4):
+            px[(sword_base_x, gy)] = (255, 215, 0, 255)
+        for i in range(1, 15):
+            bx = sword_base_x + i
+            by = sword_base_y - i
+            px[(bx, by)] = WHITE
+            px[(bx - 1, by)] = (210, 230, 255, 255)
+            px[(bx, by + 1)] = (150, 180, 210, 255)
 
         draw_pixels(img, px)
         frames.append(img)
     scale_and_save_webp(frames, "assets/sprites/pet_sword.webp", 180)
 
-# 5. 単能力：スパーク (Spark Kirby)
+
+# ==========================================
+# 5. スパークカービィ (Spark Kirby)
+# ==========================================
 def generate_spark_kirby():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        bob = -1 if frame_idx in [1, 2] else 0
-
-        draw_feet(px, cx, cy + bob)
-        draw_base_body(px, cx, cy + bob, radius=7.5)
-        draw_hands(px, cx, cy + bob, h_up=True)
-        draw_eyes_and_cheeks(px, cx, cy + bob, happy=True)
-
-        # Plasma / Electric Hat with glowing lightning sparks
-        for hx in range(cx - 5, cx + 6):
-            px[(hx, cy - 7 + bob)] = (255, 215, 0, 255)
-            px[(hx, cy - 8 + bob)] = (255, 255, 100, 255)
+        cx, cy = 32, 34
+        bob = -1 if f in [1, 2] else 0
         
-        # Electric bolts shooting out
-        shift = frame_idx * 2
-        sparks = [
-            (cx - 8, cy - 10 + bob + (shift%3)),
-            (cx - 6, cy - 12 + bob),
-            (cx + 6, cy - 12 + bob),
-            (cx + 8, cy - 9 + bob - (shift%3)),
-            (cx - 10, cy + bob),
-            (cx + 10, cy + bob)
+        draw_feet(px, cx, cy + bob)
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_hands(px, cx, cy + bob, 'cheer', bounce=2)
+        draw_cute_eyes(px, cx, cy + bob, 'sparkle')
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'open')
+
+        # Electric Plasma Crown
+        for y in range(cy - 24 + bob, cy - 11 + bob):
+            for x in range(cx - 14, cx + 15):
+                dx = abs(x - cx)
+                spike_h = 13 if dx <= 4 else (10 if dx <= 9 else 7)
+                if cy - 11 + bob - y <= spike_h:
+                    px[(x, y)] = (255, 220, 30, 255)
+                    if (x + y + f) % 3 == 0: px[(x, y)] = (255, 255, 180, 255)
+        fill_circle(px, cx, cy - 15 + bob, 3, (0, 220, 255, 255))
+        px[(cx, cy - 15 + bob)] = WHITE
+
+        # Electric Bolts
+        bolt_offsets = [
+            [(cx - 18, cy - 15), (cx - 14, cy - 22), (cx - 10, cy - 18)],
+            [(cx + 18, cy - 15), (cx + 14, cy - 22), (cx + 10, cy - 18)]
         ]
-        for sx, sy in sparks:
-            if 0 <= sx < SIZE and 0 <= sy < SIZE:
-                px[(sx, sy)] = (255, 255, 255, 255)
-                px[(sx+1, sy)] = (100, 240, 255, 255)
+        for bolt in bolt_offsets:
+            shift = (f * 2) % 3
+            for i in range(len(bolt) - 1):
+                p1, p2 = bolt[i], bolt[i+1]
+                px[(p1[0], p1[1] + bob + shift)] = WHITE
+                px[(p2[0], p2[1] + bob - shift)] = (80, 230, 255, 255)
 
         draw_pixels(img, px)
         frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/pet_spark.webp", 150)
+    scale_and_save_webp(frames, "assets/sprites/pet_spark.webp", 140)
 
-# 6. 単能力：アイス (Ice Kirby)
+
+# ==========================================
+# 6. アイスカービィ (Ice Kirby)
+# ==========================================
 def generate_ice_kirby():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        bob = -1 if frame_idx in [1, 2] else 0
-
-        draw_feet(px, cx, cy + bob)
-        draw_base_body(px, cx, cy + bob, radius=7.5)
-        draw_hands(px, cx, cy + bob)
-        draw_eyes_and_cheeks(px, cx, cy + bob)
-
-        # Ice Crown / Frost Spikes
-        ice_light = (200, 240, 255, 255)
-        ice_deep = (0, 160, 240, 255)
-        for cy_crown in range(cy - 12 + bob, cy - 6 + bob):
-            for cx_crown in range(cx - 5, cx + 6):
-                if (cx_crown - cx) % 3 == 0 or cy_crown == cy - 7 + bob:
-                    px[(cx_crown, cy_crown)] = ice_light
-                elif abs(cx_crown - cx) <= 4:
-                    px[(cx_crown, cy_crown)] = ice_deep
+        cx, cy = 32, 34
+        bob = -1 if f in [1, 2] else 0
+        blink = (f == 2)
         
-        # Snowflake particles
-        sf_y = (cy - 4 + frame_idx * 2) % SIZE
-        px[(cx - 8, sf_y)] = (240, 255, 255, 255)
-        px[(cx + 8, (sf_y + 5) % SIZE)] = (240, 255, 255, 255)
+        draw_feet(px, cx, cy + bob)
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_hands(px, cx, cy + bob, 'cheer', bounce=1)
+        draw_cute_eyes(px, cx, cy + bob, 'blink' if blink else 'normal')
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'smile')
+
+        # Crystal Ice Tiara
+        ice_cyan_light = (220, 250, 255, 255)
+        ice_cyan_mid = (120, 215, 255, 255)
+        ice_cyan_deep = (30, 140, 230, 255)
+        
+        for y in range(cy - 26 + bob, cy - 11 + bob):
+            for x in range(cx - 14, cx + 15):
+                dx = abs(x - cx)
+                spike = 15 if dx <= 2 else (12 if dx <= 7 else (8 if dx <= 12 else 0))
+                if cy - 11 + bob - y <= spike:
+                    px[(x, y)] = ice_cyan_light if x % 2 == 0 else ice_cyan_mid
+
+        # Snowflake Particles
+        snow_anim = (f * 5) % 30
+        for sx, sy in [(cx - 16, cy - 15 + snow_anim), (cx + 18, cy - 10 + ((snow_anim + 15) % 30))]:
+            if 0 <= sx < SIZE and 0 <= sy < SIZE:
+                px[(sx, sy)] = WHITE
+                px[(sx + 1, sy)] = ice_cyan_light
 
         draw_pixels(img, px)
         frames.append(img)
     scale_and_save_webp(frames, "assets/sprites/pet_ice.webp", 180)
 
-# 7. 単能力：ドクター/ウィザード (Wizard Kirby)
+
+# ==========================================
+# 7. ウィザード/ドクターカービィ (Wizard Kirby)
+# ==========================================
 def generate_wizard_kirby():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        bob = -1 if frame_idx in [1, 2] else 0
-
-        draw_feet(px, cx, cy + bob)
-        draw_base_body(px, cx, cy + bob, radius=7.5)
+        cx, cy = 32, 34
+        bob = -1 if f in [1, 2] else 0
         
-        # Big intellectual glasses (めがね)
-        draw_eyes_and_cheeks(px, cx, cy + bob)
-        # Glasses frames
-        px[(cx - 4, cy - 2 + bob)] = (100, 100, 100, 255)
-        px[(cx - 1, cy - 2 + bob)] = (100, 100, 100, 255)
-        px[(cx + 1, cy - 2 + bob)] = (100, 100, 100, 255)
-        px[(cx + 4, cy - 2 + bob)] = (100, 100, 100, 255)
-        px[(cx, cy - 2 + bob)] = (150, 150, 150, 255) # Bridge
+        draw_feet(px, cx, cy + bob)
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_cute_eyes(px, cx, cy + bob, 'sparkle')
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'smile')
 
-        # Wizard hat with stars
-        for hy in range(cy - 14 + bob, cy - 6 + bob):
-            h_width = (cy - 6 + bob - hy)
-            for hx in range(cx - h_width, cx + h_width + 1):
-                px[(hx, hy)] = (100, 50, 180, 255)
-        # Brim
-        for hx in range(cx - 7, cx + 8):
-            px[(hx, cy - 6 + bob)] = (70, 30, 140, 255)
-        # Yellow Star on hat
-        px[(cx, cy - 10 + bob)] = (255, 230, 50, 255)
+        # Round Glasses
+        for a in range(0, 360, 20):
+            rad = math.radians(a)
+            px[(int(cx - 4.5 + 3.6 * math.cos(rad)), int(cy - 2 + bob + 3.6 * math.sin(rad)))] = (110, 80, 50, 255)
+            px[(int(cx + 4.5 + 3.6 * math.cos(rad)), int(cy - 2 + bob + 3.6 * math.sin(rad)))] = (110, 80, 50, 255)
+        px[(cx - 1, cy - 2 + bob)] = (180, 140, 60, 255)
+        px[(cx, cy - 2 + bob)] = (180, 140, 60, 255)
+        px[(cx + 1, cy - 2 + bob)] = (180, 140, 60, 255)
+
+        # Wizard Hat
+        hat_purple = (110, 45, 185, 255)
+        for y in range(cy - 28 + bob, cy - 14 + bob):
+            h_dist = cy - 14 + bob - y
+            cone_w = max(1, int(14 - h_dist * 0.9))
+            for x in range(cx - cone_w, cx + cone_w + 1):
+                px[(x, y)] = hat_purple
+        fill_circle(px, cx, cy - 20 + bob, 2.5, (255, 225, 40, 255))
+
+        # Magic Wand
+        wand_x, wand_y = cx + 16, cy + 2 + bob
+        fill_circle(px, wand_x, wand_y, 4.5, PINK_BODY)
+        for i in range(1, 12): px[(wand_x + i//2, wand_y - i)] = (180, 120, 60, 255)
+        fill_circle(px, wand_x + 6, wand_y - 12, 3.5, (255, 230, 50, 255))
+        px[(wand_x + 6, wand_y - 12)] = WHITE
 
         draw_pixels(img, px)
         frames.append(img)
     scale_and_save_webp(frames, "assets/sprites/pet_wizard.webp", 180)
 
-# 8. 複合能力：バーニングソード (Burning Sword Kirby)
+
+# ==========================================
+# 8. バーニングソード (Burning Sword Kirby)
+# ==========================================
 def generate_burning_sword():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        bob = -1 if frame_idx in [1, 2] else 0
-
+        cx, cy = 28, 34
+        bob = -1 if f in [1, 2] else 0
+        
         draw_feet(px, cx, cy + bob)
-        draw_base_body(px, cx, cy + bob, radius=7.5)
-        draw_eyes_and_cheeks(px, cx, cy + bob, happy=True)
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_cute_eyes(px, cx, cy + bob, 'sparkle')
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'open')
 
-        # Flaming Knight Helm
-        for fy in range(cy - 13 + bob, cy - 6 + bob):
-            for fx in range(cx - 6, cx + 7):
-                if abs(fx - cx) <= (cy - 6 + bob - fy):
-                    px[(fx, fy)] = (255, 69, 0, 255) if (fx+fy+frame_idx)%2==0 else (255, 200, 0, 255)
-        # Gold crown base
-        for fx in range(cx - 7, cx + 8):
-            px[(fx, cy - 6 + bob)] = (255, 215, 0, 255)
+        # Flaming Knight Helmet
+        for y in range(cy - 16 + bob, cy - 10 + bob):
+            for x in range(cx - 14, cx + 15):
+                if (x - cx)**2 <= 14**2: px[(x, y)] = (255, 200, 20, 255)
+        fill_circle(px, cx, cy - 13 + bob, 3, (240, 30, 40, 255))
+        px[(cx, cy - 14 + bob)] = WHITE
 
-        # Huge Flaming Greatsword!
-        sw_y = cy - 4 + bob
-        for i in range(10):
-            fx = cx + 7 + i//2
-            fy = sw_y - i
-            px[(fx, fy)] = (255, 255, 200, 255) # Core
-            px[(fx+1, fy)] = (255, 100, 0, 255) # Fire aura
-            px[(fx-1, fy)] = (255, 50, 0, 255)
-        px[(cx + 6, sw_y + 1)] = (255, 215, 0, 255)
+        # Flame Crest
+        for y in range(cy - 30 + bob, cy - 15 + bob):
+            h_ratio = (cy - 15 + bob - y) / 15.0
+            flame_w = int(14 * (1.0 - h_ratio * 0.5))
+            for x in range(cx - flame_w, cx + flame_w + 1):
+                dist = abs(x - cx) / max(1, flame_w)
+                if dist < 0.35: px[(x, y)] = (255, 255, 200, 255)
+                elif dist < 0.7: px[(x, y)] = (255, 180, 20, 255)
+                else: px[(x, y)] = (220, 30, 10, 255)
+
+        # Huge Flaming Greatsword
+        sw_x, sw_y = cx + 18, cy + 2 + bob
+        fill_circle(px, sw_x, sw_y, 4.5, PINK_BODY)
+        for i in range(1, 20):
+            bx = sw_x + int(i * 0.8)
+            by = sw_y - i
+            px[(bx, by)] = (255, 255, 240, 255)
+            px[(bx - 1, by)] = (255, 230, 80, 255)
+            px[(bx + 1, by)] = (255, 120, 20, 255)
+            px[(bx + 2, by)] = (255, 50, 10, 255)
 
         draw_pixels(img, px)
         frames.append(img)
     scale_and_save_webp(frames, "assets/sprites/pet_burning_sword.webp", 150)
 
-# 9. 複合能力：スパークブレード (Spark Blade Kirby)
+
+# ==========================================
+# 9. スパークブレード/カッター (Spark Cutter Kirby)
+# ==========================================
 def generate_spark_cutter():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        bob = -1 if frame_idx in [1, 2] else 0
-
+        cx, cy = 30, 34
+        bob = -1 if f in [1, 2] else 0
+        
         draw_feet(px, cx, cy + bob)
-        draw_base_body(px, cx, cy + bob, radius=7.5)
-        draw_eyes_and_cheeks(px, cx, cy + bob, happy=True)
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_cute_eyes(px, cx, cy + bob, 'sparkle')
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'open')
 
-        # Emerald & Lightning Cap
-        for cy_cap in range(cy - 12 + bob, cy - 6 + bob):
-            for cx_cap in range(cx - 6, cx + 7):
-                px[(cx_cap, cy_cap)] = (0, 200, 100, 255)
-        # Lightning Crest
-        px[(cx, cy - 9 + bob)] = (255, 255, 100, 255)
+        # Visor & Gold Helmet
+        for x in range(cx - 10, cx + 11):
+            for y in range(cy - 6 + bob, cy - 2 + bob): px[(x, y)] = (0, 220, 255, 220)
+        for x in range(cx - 14, cx + 15):
+            px[(x, cy - 12 + bob)] = (255, 215, 0, 255)
 
-        # Dual Plasma Blades
-        for i in range(8):
-            px[(cx + 7 + i//2, cy - 2 - i + bob)] = (100, 255, 255, 255)
-            px[(cx - 7 - i//2, cy - 2 - i + bob)] = (100, 255, 255, 255)
+        # Boomerang Cutter
+        for a in range(-60, 61, 6):
+            rad = math.radians(a + (f * 5))
+            bl_x = int(cx + 18 * math.cos(rad))
+            bl_y = int(cy - 18 + bob + 10 * math.sin(rad))
+            px[(bl_x, bl_y)] = WHITE
+            px[(bl_x + 1, bl_y)] = (0, 230, 255, 255)
+
+        # Hand blade
+        sw_x, sw_y = cx + 17, cy + 2 + bob
+        fill_circle(px, sw_x, sw_y, 4.5, PINK_BODY)
+        for i in range(1, 16):
+            px[(sw_x + i, sw_y - i)] = WHITE
+            px[(sw_x + i + 1, sw_y - i)] = (0, 240, 255, 255)
 
         draw_pixels(img, px)
         frames.append(img)
     scale_and_save_webp(frames, "assets/sprites/pet_spark_cutter.webp", 150)
 
-# 10. 複合能力：フロストボム (Frost Bomb / Spark Kirby)
+
+# ==========================================
+# 10. フロストスパーク (Frost Spark Kirby)
+# ==========================================
 def generate_frost_spark():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        bob = -1 if frame_idx in [1, 2] else 0
-
+        cx, cy = 32, 34
+        bob = -1 if f in [1, 2] else 0
+        
         draw_feet(px, cx, cy + bob)
-        draw_base_body(px, cx, cy + bob, radius=7.5)
-        draw_eyes_and_cheeks(px, cx, cy + bob, happy=True)
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_cute_eyes(px, cx, cy + bob, 'sparkle')
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'open')
 
-        # Cyan / Blue Ice & Plasma Crown
-        for cy_crown in range(cy - 13 + bob, cy - 6 + bob):
-            for cx_crown in range(cx - 6, cx + 7):
-                if (cx_crown + cy_crown + frame_idx) % 2 == 0:
-                    px[(cx_crown, cy_crown)] = (0, 255, 255, 255)
-                else:
-                    px[(cx_crown, cy_crown)] = (200, 255, 255, 255)
-
-        # Orbiting Ice Crystal Bombs
-        angle_offsets = [0, 90, 180, 270]
-        for a in angle_offsets:
-            ox = int(cx + 10 * ((frame_idx + a/90) % 2 * 2 - 1))
-            oy = int(cy + 6 * ((frame_idx + 1 + a/90) % 2 * 2 - 1))
-            if 0 <= ox < SIZE and 0 <= oy < SIZE:
-                px[(ox, oy)] = (0, 220, 255, 255)
-                px[(ox+1, oy)] = (255, 255, 255, 255)
+        # Aurora Crystal Master Tiara
+        for y in range(cy - 28 + bob, cy - 11 + bob):
+            for x in range(cx - 15, cx + 16):
+                dx = abs(x - cx)
+                spike = 17 if dx <= 3 else (13 if dx <= 8 else 8)
+                if cy - 11 + bob - y <= spike:
+                    hue = (x + y + f * 2) % 4
+                    if hue == 0: px[(x, y)] = (180, 245, 255, 255)
+                    elif hue == 1: px[(x, y)] = (255, 255, 150, 255)
+                    elif hue == 2: px[(x, y)] = (255, 170, 240, 255)
+                    else: px[(x, y)] = WHITE
 
         draw_pixels(img, px)
         frames.append(img)
     scale_and_save_webp(frames, "assets/sprites/pet_frost_spark.webp", 150)
 
-# 11. 究極形態：スターロッド・レジェンド (Star Legend Kirby)
+
+# ==========================================
+# 11. スターレジェンド (Star Legend Kirby - Ultimate)
+# ==========================================
 def generate_star_legend():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        bob = -1 if frame_idx in [1, 2] else 0
-
+        cx, cy = 28, 34
+        bob = -1 if f in [1, 2] else 0
+        
         draw_feet(px, cx, cy + bob)
-        # Golden Rainbow Aura Kirby!
-        aura_colors = [(255, 215, 0, 255), (255, 180, 220, 255), (100, 240, 255, 255), (255, 255, 255, 255)]
-        draw_base_body(px, cx, cy + bob, radius=7.5)
-        draw_hands(px, cx, cy + bob, h_up=True)
-        draw_eyes_and_cheeks(px, cx, cy + bob, happy=True)
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_cute_eyes(px, cx, cy + bob, 'sparkle')
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'open')
 
-        # Radiant Star Tiara
-        px[(cx, cy - 10 + bob)] = (255, 255, 255, 255)
-        px[(cx-1, cy - 9 + bob)] = (255, 215, 0, 255)
-        px[(cx, cy - 9 + bob)] = (255, 215, 0, 255)
-        px[(cx+1, cy - 9 + bob)] = (255, 215, 0, 255)
-        for fx in range(cx - 6, cx + 7):
-            px[(fx, cy - 7 + bob)] = (255, 215, 0, 255)
+        # Rainbow Star Crown
+        for y in range(cy - 26 + bob, cy - 12 + bob):
+            for x in range(cx - 15, cx + 16):
+                dx = abs(x - cx)
+                spike = 14 if dx in [0, 1, 2, 7, 8, 13, 14] else 9
+                if cy - 12 + bob - y <= spike:
+                    px[(x, y)] = (255, 215, 0, 255)
+                    if (x + y) % 3 == 0: px[(x, y)] = (255, 255, 180, 255)
+        fill_circle(px, cx, cy - 22 + bob, 3, (255, 60, 120, 255))
+        px[(cx, cy - 22 + bob)] = WHITE
 
-        # Star Rod in hand
-        # Wand handle
-        for i in range(8):
-            px[(cx + 8, cy + 4 - i + bob)] = (255, 50, 80, 255) if i % 2 == 0 else (255, 255, 255, 255)
-        # Glowing Star on top
-        star_y = cy - 5 + bob
-        px[(cx + 8, star_y - 2)] = (255, 255, 255, 255)
-        for sx in range(cx + 6, cx + 11):
-            px[(sx, star_y - 1)] = (255, 230, 50, 255)
-        px[(cx + 7, star_y)] = (255, 215, 0, 255)
-        px[(cx + 8, star_y)] = (255, 255, 255, 255)
-        px[(cx + 9, star_y)] = (255, 215, 0, 255)
-        px[(cx + 7, star_y + 1)] = (255, 200, 0, 255)
-        px[(cx + 9, star_y + 1)] = (255, 200, 0, 255)
-
-        # Twinkling sparkles around
-        sparkle_pos = [(cx - 9, cy - 6 + frame_idx), (cx + 10, cy - 8 - frame_idx), (cx - 7, cy + 7 - frame_idx)]
-        for sx, sy in sparkle_pos:
-            if 0 <= sx < SIZE and 0 <= sy < SIZE:
-                px[(sx, sy)] = (255, 255, 150, 255)
+        # Legendary Star Rod (スターロッド)
+        rod_x, rod_y = cx + 18, cy + 2 + bob
+        fill_circle(px, rod_x, rod_y, 4.5, PINK_BODY)
+        for i in range(1, 18):
+            rx = rod_x + int(i * 0.4)
+            ry = rod_y - i
+            color = (255, 50, 80, 255) if (i // 3) % 2 == 0 else WHITE
+            px[(rx, ry)] = color
+        
+        star_tip_x, star_tip_y = rod_x + 8, rod_y - 20
+        fill_circle(px, star_tip_x, star_tip_y, 5, (255, 225, 30, 255))
+        fill_circle(px, star_tip_x, star_tip_y, 2.5, WHITE)
 
         draw_pixels(img, px)
         frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/pet_star_legend.webp", 140)
+    scale_and_save_webp(frames, "assets/sprites/pet_star_legend.webp", 150)
 
-# --- 敵キャラクター (Monsters) ---
+
+# ==========================================
+# 12. もぐもぐ食べるカービィ (Eating Kirby)
+# ==========================================
+def generate_eating_kirby():
+    frames = []
+    for f in range(4):
+        img = create_frame()
+        px = {}
+        cx, cy = 32, 34
+        bob = -1 if f % 2 == 1 else 1
+        squash = 2 if f % 2 == 0 else -1
+        
+        draw_feet(px, cx, cy + bob)
+        draw_shaded_body(px, cx, cy + bob, radius=16, squash_x=squash, squash_y=-squash)
+        draw_hands(px, cx, cy + bob, 'normal')
+        draw_cute_eyes(px, cx, cy + bob, 'happy')
+        draw_cheeks_and_mouth(px, cx, cy + bob, 'eating')
+
+        if f in [1, 3]:
+            px[(cx - 10, cy + 8 + bob)] = (255, 215, 0, 255)
+            px[(cx + 11, cy + 7 + bob)] = (255, 180, 50, 255)
+
+        draw_pixels(img, px)
+        frames.append(img)
+    scale_and_save_webp(frames, "assets/sprites/pet_eating.webp", 160)
+
+
+# ==========================================
+# 13. すいこみカービィ (Inhale Kirby)
+# ==========================================
+def generate_inhale_kirby():
+    frames = []
+    for f in range(4):
+        img = create_frame()
+        px = {}
+        cx, cy = 34, 32
+        
+        draw_feet(px, cx - 2, cy + 2)
+        draw_shaded_body(px, cx, cy, radius=18)
+        draw_cute_eyes(px, cx, cy - 2, 'normal')
+        draw_cheeks_and_mouth(px, cx, cy, 'inhale')
+        
+        fill_circle(px, cx - 18, cy + 6, 4, PINK_BODY)
+        fill_circle(px, cx + 18, cy + 6, 4, PINK_BODY)
+
+        # Inhale Wind Vortex
+        v_offset = f * 3
+        for r in range(12, 28, 4):
+            arc_a = (v_offset * 15 + r * 10) % 360
+            rad = math.radians(arc_a)
+            wx = int(cx + r * math.cos(rad))
+            wy = int(cy + 4 + (r * 0.6) * math.sin(rad))
+            if 0 <= wx < SIZE and 0 <= wy < SIZE:
+                px[(wx, wy)] = (240, 250, 255, 220)
+
+        draw_pixels(img, px)
+        frames.append(img)
+    scale_and_save_webp(frames, "assets/sprites/pet_inhale.webp", 140)
+
+
+# ==========================================
+# 14. 病気カービィ (Sick Kirby)
+# ==========================================
+def generate_sick_kirby():
+    frames = []
+    for f in range(4):
+        img = create_frame()
+        px = {}
+        cx, cy = 32, 36
+        bob = 1 if f % 2 == 1 else 0
+        
+        draw_feet(px, cx, cy + bob)
+        draw_shaded_body(px, cx, cy + bob, radius=16)
+        draw_cute_eyes(px, cx, cy + bob, 'sick')
+        
+        for x in range(cx - 3, cx + 4):
+            px[(x, cy + 4 + bob - abs(x - cx)//2)] = OUTLINE
+        
+        # Ice pack on head
+        bag_y = cy - 16 + bob
+        fill_circle(px, cx, bag_y, 6, (160, 220, 255, 255))
+        fill_circle(px, cx, bag_y - 6, 2.5, (255, 215, 0, 255))
+
+        if f in [1, 3]:
+            fill_circle(px, cx + 13, cy - 4 + bob, 2, (100, 200, 255, 255))
+
+        draw_pixels(img, px)
+        frames.append(img)
+    scale_and_save_webp(frames, "assets/sprites/pet_sick.webp", 200)
+
+
+# ==========================================
+# 15. おばけカービィ (Ghost Kirby)
+# ==========================================
+def generate_ghost_kirby():
+    frames = []
+    GHOST_WHITE = (230, 240, 255, 220)
+    GHOST_SHADOW = (175, 195, 230, 220)
+    GHOST_LIGHT = (255, 255, 255, 240)
+    
+    for f in range(4):
+        img = create_frame()
+        px = {}
+        cx, cy = 32, 28
+        float_y = int(math.sin(f * (math.pi / 2)) * 3)
+        
+        for y in range(cy - 14 + float_y, cy + 18 + float_y):
+            for x in range(cx - 15, cx + 16):
+                if y <= cy + 6 + float_y:
+                    dist_sq = (x - cx)**2 / (15.0**2) + (y - (cy + float_y))**2 / (14.0**2)
+                    if dist_sq <= 1.0:
+                        px[(x, y)] = GHOST_WHITE
+                        if x < cx - 4 and y < cy + float_y - 4: px[(x, y)] = GHOST_LIGHT
+                    elif dist_sq <= 1.15:
+                        px[(x, y)] = (80, 100, 140, 220)
+                else:
+                    wave = int(math.sin((y - cy) * 0.6 + f * 1.5) * 4)
+                    tail_w = max(1, 14 - (y - (cy + 6 + float_y)))
+                    if abs(x - cx + wave) <= tail_w:
+                        px[(x, y)] = GHOST_SHADOW
+
+        # Rounded Glowing Eyes
+        fill_ellipse(px, cx - 5, cy - 1 + float_y, 2.5, 3.5, (30, 70, 150, 255))
+        fill_ellipse(px, cx + 5, cy - 1 + float_y, 2.5, 3.5, (30, 70, 150, 255))
+        px[(cx - 5, cy - 2 + float_y)] = WHITE
+        px[(cx + 5, cy - 2 + float_y)] = WHITE
+        fill_circle(px, cx, cy + 4 + float_y, 2.0, (30, 70, 150, 255))
+
+        # Angel Halo
+        halo_y = cy - 18 + float_y
+        for x in range(cx - 10, cx + 11):
+            px[(x, halo_y)] = (255, 230, 80, 255)
+            px[(x, halo_y + 1)] = (255, 200, 40, 255)
+
+        draw_pixels(img, px)
+        frames.append(img)
+    scale_and_save_webp(frames, "assets/sprites/pet_ghost.webp", 180)
+
+
+# ==========================================
+# 16. うんち (Poop)
+# ==========================================
+def generate_poop():
+    frames = []
+    POOP_BROWN = (190, 110, 40, 255)
+    POOP_LIGHT = (225, 145, 60, 255)
+    POOP_DARK = (130, 70, 20, 255)
+    
+    for f in range(2):
+        img = create_frame()
+        px = {}
+        cx, cy = 32, 36
+        bob = -1 if f == 1 else 0
+        
+        # 3-tier Soft Serve Poop Shape
+        for y in range(cy + 4 + bob, cy + 14 + bob):
+            for x in range(cx - 14, cx + 15):
+                if (x - cx)**2 / 196.0 + (y - (cy + 9 + bob))**2 / 25.0 <= 1.0:
+                    px[(x, y)] = POOP_LIGHT if y < cy + 8 + bob and x < cx else (POOP_DARK if y > cy + 10 + bob else POOP_BROWN)
+        
+        for y in range(cy - 4 + bob, cy + 6 + bob):
+            for x in range(cx - 10, cx + 11):
+                if (x - cx)**2 / 100.0 + (y - (cy + 1 + bob))**2 / 25.0 <= 1.0:
+                    px[(x, y)] = POOP_LIGHT if y < cy and x < cx else (POOP_DARK if y > cy + 3 + bob else POOP_BROWN)
+
+        for y in range(cy - 12 + bob, cy - 2 + bob):
+            for x in range(cx - 6, cx + 7):
+                if (x - cx)**2 / 36.0 + (y - (cy - 7 + bob))**2 / 20.0 <= 1.0:
+                    px[(x, y)] = POOP_LIGHT if y < cy - 8 + bob else POOP_BROWN
+        px[(cx + 2, cy - 13 + bob)] = POOP_LIGHT
+
+        px[(cx - 14, cy - 8 + bob)] = (255, 230, 100, 255)
+        px[(cx + 15, cy - 4 - bob)] = (255, 230, 100, 255)
+
+        draw_pixels(img, px)
+        frames.append(img)
+    scale_and_save_webp(frames, "assets/sprites/poop.webp", 250)
+
+
+# ==========================================
+# 17. 敵キャラ：ワドルディ (Waddle Dee - Ultra Cute HD)
+# ==========================================
 def generate_waddle_dee():
     frames = []
-    for frame_idx in range(4):
+    WD_ORANGE = (255, 140, 40, 255)
+    WD_ORANGE_LIGHT = (255, 185, 90, 255)
+    WD_ORANGE_SHADOW = (220, 95, 25, 255)
+    WD_ORANGE_DEEP = (180, 65, 15, 255)
+    WD_FACE = (255, 230, 195, 255)
+    WD_FACE_LIGHT = (255, 245, 225, 255)
+    WD_FACE_SHADOW = (240, 200, 160, 255)
+    WD_FEET = (255, 205, 25, 255)
+    WD_FEET_LIGHT = (255, 230, 80, 255)
+    WD_FEET_SHADOW = (200, 145, 0, 255)
+    
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 17
-        bob = 1 if frame_idx in [1, 3] else 0
+        cx, cy = 32, 34
+        bob = -1 if f in [1, 2] else 0
+        blink = (f == 2)
         
-        # Feet (Yellow)
-        for fx in range(cx - 7, cx - 2):
-            for fy in range(cy + 6 + bob, cy + 9 + bob):
-                px[(fx, fy)] = (255, 215, 0, 255)
-        for fx in range(cx + 2, cx + 7):
-            for fy in range(cy + 6 + bob, cy + 9 + bob):
-                px[(fx, fy)] = (255, 215, 0, 255)
+        # Yellow Feet (Chubby rounded ovals)
+        for (fx, fy, is_l) in [(cx - 10, cy + 13 + bob, True), (cx + 10, cy + 13 + bob, False)]:
+            for y in range(fy - 4, fy + 6):
+                for x in range(fx - 7, fx + 8):
+                    dist = (x - fx)**2 / 40.0 + (y - fy)**2 / 18.0
+                    if dist <= 1.0:
+                        if y < fy: px[(x, y)] = WD_FEET_LIGHT
+                        elif y > fy + 2: px[(x, y)] = WD_FEET_SHADOW
+                        else: px[(x, y)] = WD_FEET
+                    elif dist <= 1.25:
+                        px[(x, y)] = OUTLINE
 
-        # Orange Body
-        for y in range(cy - 6 + bob, cy + 7 + bob):
-            for x in range(cx - 7, cx + 8):
-                if (x - cx)**2 + (y - (cy + bob))**2 <= 6.8**2:
-                    px[(x, y)] = (240, 110, 30, 255)
-        
-        # Tan face mask
-        for y in range(cy - 4 + bob, cy + 4 + bob):
-            for x in range(cx - 5, cx + 6):
-                if (x - cx)**2 / 5.0**2 + (y - (cy + bob))**2 / 4.0**2 <= 1.0:
-                    px[(x, y)] = (255, 230, 190, 255)
+        # Round Orange Body
+        for y in range(cy - 18 + bob, cy + 17 + bob):
+            for x in range(cx - 18, cx + 19):
+                dx = (x - cx) / 16.0
+                dy = (y - (cy + bob)) / 16.0
+                dist_sq = dx * dx + dy * dy
+                if dist_sq <= 1.0:
+                    if dx < -0.25 and dy < -0.25 and dist_sq > 0.25: px[(x, y)] = WD_ORANGE_LIGHT
+                    elif dy > 0.4: px[(x, y)] = WD_ORANGE_DEEP if dist_sq > 0.85 else WD_ORANGE_SHADOW
+                    else: px[(x, y)] = WD_ORANGE
+                elif dist_sq <= 1.18:
+                    px[(x, y)] = OUTLINE
 
-        # Eyes & Cheeks
-        px[(cx - 2, cy - 1 + bob)] = BLACK
-        px[(cx - 2, cy + bob)] = (50, 100, 200, 255)
-        px[(cx + 2, cy - 1 + bob)] = BLACK
-        px[(cx + 2, cy + bob)] = (50, 100, 200, 255)
-        px[(cx - 4, cy + 1 + bob)] = (255, 120, 100, 255)
-        px[(cx + 4, cy + 1 + bob)] = (255, 120, 100, 255)
+        # Heart-shaped Cream Face (Smooth round curve)
+        for y in range(cy - 11 + bob, cy + 12 + bob):
+            for x in range(cx - 12, cx + 13):
+                dist = (x - cx)**2 / 130.0 + (y - (cy + bob + 0.5))**2 / 85.0
+                if dist <= 1.0:
+                    if y < cy + bob - 4: px[(x, y)] = WD_FACE_LIGHT
+                    elif y > cy + bob + 6: px[(x, y)] = WD_FACE_SHADOW
+                    else: px[(x, y)] = WD_FACE
+
+        # Beautiful Rounded Eyes (Oval)
+        if blink:
+            for dx in range(-6, -1):
+                px[(cx + dx, cy - 2 + bob)] = OUTLINE
+            for dx in range(2, 7):
+                px[(cx + dx, cy - 2 + bob)] = OUTLINE
+        else:
+            for (ecx, is_left) in [(cx - 4.5, True), (cx + 4.5, False)]:
+                ecy = cy - 2.0 + bob
+                fill_ellipse(px, ecx, ecy, 2.2, 4.2, (25, 35, 75, 255))
+                # Outline
+                for a in range(0, 360, 30):
+                    rad = math.radians(a)
+                    px[(int(ecx + 2.5 * math.cos(rad)), int(ecy + 4.5 * math.sin(rad)))] = OUTLINE
+                # Top White Shine
+                fill_ellipse(px, ecx - 0.4, ecy - 1.8, 1.2, 1.8, WHITE)
+                # Bottom Blue Glow
+                px[(int(ecx + 0.5), int(ecy + 2.0))] = (80, 160, 255, 255)
+
+        # Cheeks (Cute Pink Ovals)
+        fill_ellipse(px, cx - 8.5, cy + 2.5 + bob, 2.2, 1.5, (255, 100, 130, 255))
+        fill_ellipse(px, cx + 8.5, cy + 2.5 + bob, 2.2, 1.5, (255, 100, 130, 255))
+
+        # Little Hands
+        fill_circle(px, cx - 15, cy + 4 + bob, 4.0, WD_ORANGE)
+        px[(cx - 15, cy + 2 + bob)] = WD_ORANGE_LIGHT
+        for a in range(0, 360, 30):
+            rad = math.radians(a)
+            px[(int(cx - 15 + 4.2 * math.cos(rad)), int(cy + 4 + bob + 4.2 * math.sin(rad)))] = OUTLINE
+
+        fill_circle(px, cx + 15, cy + 4 + bob, 4.0, WD_ORANGE)
+        px[(cx + 15, cy + 2 + bob)] = WD_ORANGE_LIGHT
+        for a in range(0, 360, 30):
+            rad = math.radians(a)
+            px[(int(cx + 15 + 4.2 * math.cos(rad)), int(cy + 4 + bob + 4.2 * math.sin(rad)))] = OUTLINE
 
         draw_pixels(img, px)
         frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/enemy_waddle_dee.webp", 200)
+    scale_and_save_webp(frames, "assets/sprites/enemy_waddle_dee.webp", 180)
 
-def generate_bronto_burt():
+
+# ==========================================
+# 18. 敵キャラ：デデデ大王 (King Dedede - Rich HD)
+# ==========================================
+def generate_king_dedede():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        wing_y = -3 if frame_idx in [0, 2] else 1
+        cx, cy = 32, 34
+        bob = -1 if f in [1, 2] else 0
         
-        # Wings
-        for wx in range(cx - 10, cx - 5):
-            for wy in range(cy + wing_y - 2, cy + wing_y + 3):
-                px[(wx, wy)] = (255, 255, 255, 255)
-        for wx in range(cx + 5, cx + 10):
-            for wy in range(cy + wing_y - 2, cy + wing_y + 3):
-                px[(wx, wy)] = (255, 255, 255, 255)
+        # Big Feet
+        for fx in [cx - 11, cx + 11]:
+            fill_ellipse(px, fx, cy + 17 + bob, 7.0, 3.5, (255, 200, 20, 255))
+            fill_ellipse(px, fx, cy + 16 + bob, 6.0, 2.0, (255, 230, 80, 255))
 
-        # Purple body
-        for y in range(cy - 6, cy + 7):
-            for x in range(cx - 6, cx + 7):
-                if (x - cx)**2 + (y - cy)**2 <= 6**2:
-                    px[(x, y)] = (180, 50, 180, 255)
+        # Royal Red Robe
+        for y in range(cy - 12 + bob, cy + 17 + bob):
+            for x in range(cx - 19, cx + 20):
+                if (x - cx)**2 / 340.0 + (y - (cy + 2 + bob))**2 / 210.0 <= 1.0:
+                    px[(x, y)] = (215, 30, 40, 255)
+                    if x < cx - 8: px[(x, y)] = (245, 60, 70, 255)
+                    elif x > cx + 8: px[(x, y)] = (170, 15, 25, 255)
 
-        # Big round eyes
-        px[(cx - 2, cy - 1)] = WHITE
-        px[(cx - 2, cy)] = BLACK
-        px[(cx + 2, cy - 1)] = WHITE
-        px[(cx + 2, cy)] = BLACK
+        # White Fur Trim on Robe
+        for x in range(cx - 18, cx + 19):
+            px[(x, cy + 13 + bob)] = WHITE
+            px[(x, cy + 14 + bob)] = (220, 230, 245, 255)
 
-        draw_pixels(img, px)
-        frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/enemy_bronto_burt.webp", 150)
-
-def generate_gordo():
-    frames = []
-    for frame_idx in range(4):
-        img = create_frame()
-        px = {}
-        cx, cy = 16, 16
-
-        # Spikes (8 directions)
-        spikes = [(0, -9), (0, 9), (-9, 0), (9, 0), (-6, -6), (6, -6), (-6, 6), (6, 6)]
-        for sx, sy in spikes:
-            px[(cx + sx, cy + sy)] = (180, 190, 200, 255)
-            px[(cx + sx//2, cy + sy//2)] = (120, 130, 140, 255)
-
-        # Dark iron sphere
-        for y in range(cy - 6, cy + 7):
-            for x in range(cx - 6, cx + 7):
-                if (x - cx)**2 + (y - cy)**2 <= 6**2:
-                    px[(x, y)] = (60, 65, 75, 255) if (x-cx< -1 and y-cy< -1) else (30, 35, 45, 255)
-
-        # Glowing yellow unblinking eyes
-        px[(cx - 2, cy - 1)] = (255, 230, 0, 255)
-        px[(cx - 2, cy)] = BLACK
-        px[(cx + 2, cy - 1)] = (255, 230, 0, 255)
-        px[(cx + 2, cy)] = BLACK
-
-        draw_pixels(img, px)
-        frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/enemy_gordo.webp", 200)
-
-def generate_dedede():
-    frames = []
-    for frame_idx in range(4):
-        img = create_frame()
-        px = {}
-        cx, cy = 16, 16
-        bob = -1 if frame_idx in [1, 2] else 0
-
-        # Big Blue Body / Yellow Beak / Red Robe
-        # Yellow feet
-        for fx in range(cx - 8, cx - 2):
-            for fy in range(cy + 8 + bob, cy + 12 + bob):
-                px[(fx, fy)] = (255, 200, 0, 255)
-        for fx in range(cx + 2, cx + 8):
-            for fy in range(cy + 8 + bob, cy + 12 + bob):
-                px[(fx, fy)] = (255, 200, 0, 255)
-
-        # Red King's Robe
-        for y in range(cy - 6 + bob, cy + 9 + bob):
-            for x in range(cx - 9, cx + 10):
-                if (x - cx)**2 / 9.0**2 + (y - (cy + bob))**2 / 8.0**2 <= 1.0:
-                    px[(x, y)] = (220, 20, 40, 255)
-        # White fluff trim
-        for fx in range(cx - 8, cx + 9):
-            px[(fx, cy + 7 + bob)] = (255, 255, 255, 255)
+        # Yellow Belly
+        fill_ellipse(px, cx, cy + 3 + bob, 9.0, 9.0, (255, 230, 140, 255))
+        fill_ellipse(px, cx, cy + 2 + bob, 8.0, 8.0, (255, 245, 180, 255))
 
         # Blue Penguin Face
-        for y in range(cy - 6 + bob, cy + 2 + bob):
-            for x in range(cx - 6, cx + 7):
-                if (x - cx)**2 + (y - (cy - 2 + bob))**2 <= 5.5**2:
-                    px[(x, y)] = (30, 120, 220, 255)
+        fill_ellipse(px, cx, cy - 9 + bob, 12.0, 10.0, (40, 110, 215, 255))
+        fill_ellipse(px, cx - 3, cy - 11 + bob, 7.0, 5.0, (75, 145, 245, 255))
 
-        # Yellow Beak
-        for x in range(cx - 3, cx + 4):
-            px[(x, cy + 1 + bob)] = (255, 215, 0, 255)
-            px[(x, cy + 2 + bob)] = (240, 160, 0, 255)
+        # Yellow Beak (Smooth 3D shape)
+        fill_ellipse(px, cx, cy - 3 + bob, 9.0, 4.5, (255, 195, 20, 255))
+        fill_ellipse(px, cx, cy - 4 + bob, 7.5, 3.0, (255, 230, 70, 255))
+        for x in range(cx - 8, cx + 9):
+            px[(x, cy - 2 + bob)] = (210, 130, 10, 255)
 
-        # Eyes
-        px[(cx - 2, cy - 3 + bob)] = WHITE
-        px[(cx - 2, cy - 2 + bob)] = BLACK
-        px[(cx + 2, cy - 3 + bob)] = WHITE
-        px[(cx + 2, cy - 2 + bob)] = BLACK
+        # Expressive Eyes
+        for ecx in [cx - 4.5, cx + 4.5]:
+            fill_ellipse(px, ecx, cy - 10 + bob, 2.2, 3.5, WHITE)
+            fill_ellipse(px, ecx + (0.5 if ecx>cx else -0.5), cy - 10 + bob, 1.2, 2.2, BLACK)
+            px[(int(ecx), cy - 11 + bob)] = WHITE
 
-        # Royal Crown Hat
-        for hx in range(cx - 5, cx + 6):
-            px[(hx, cy - 7 + bob)] = (255, 215, 0, 255)
-            px[(hx, cy - 8 + bob)] = (220, 20, 40, 255)
-        px[(cx, cy - 9 + bob)] = (255, 255, 255, 255)
+        # Royal Crown & Knit Hat
+        for y in range(cy - 26 + bob, cy - 15 + bob):
+            for x in range(cx - 12, cx + 13):
+                if abs(x - cx) <= 12 - (cy - 15 + bob - y):
+                    px[(x, y)] = (215, 30, 40, 255)
+        fill_circle(px, cx, cy - 26 + bob, 4.0, (255, 220, 40, 255))
+        px[(cx, cy - 27 + bob)] = WHITE
 
         draw_pixels(img, px)
         frames.append(img)
     scale_and_save_webp(frames, "assets/sprites/enemy_king_dedede.webp", 180)
 
-# --- 特殊アクション：すいこみ・食べる・進化・うんち・病気・ゴースト ---
-def generate_poop():
+
+# ==========================================
+# 19. 敵キャラ：ゴルドー (Gordo - Spiky HD)
+# ==========================================
+def generate_gordo():
     frames = []
-    for frame_idx in range(4):
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 20
-        # Cute brown pixel poop with eyes
-        BROWN = (139, 69, 19, 255)
-        BROWN_LIGHT = (180, 100, 30, 255)
+        cx, cy = 32, 32
         
-        # Base swirl
-        for y in range(cy, cy + 6):
-            for x in range(cx - 5, cx + 6):
-                if (x - cx)**2 / 5.0**2 + (y - (cy + 2))**2 / 3.0**2 <= 1.0:
-                    px[(x, y)] = BROWN
-        # Mid swirl
-        for y in range(cy - 4, cy + 1):
-            for x in range(cx - 4, cx + 5):
-                if (x - cx)**2 / 4.0**2 + (y - (cy - 1))**2 / 2.5**2 <= 1.0:
-                    px[(x, y)] = BROWN_LIGHT
-        # Top peak
-        px[(cx, cy - 6 + (1 if frame_idx%2==0 else 0))] = BROWN
-        px[(cx + 1, cy - 5)] = BROWN
-        px[(cx - 1, cy - 5)] = BROWN
+        # 8 Massive Spikes with 3D Shading
+        for a in range(0, 360, 45):
+            rad = math.radians(a + (f * 8))
+            for dist in range(12, 27):
+                sx = int(cx + dist * math.cos(rad))
+                sy = int(cy + dist * math.sin(rad))
+                if 0 <= sx < SIZE and 0 <= sy < SIZE:
+                    px[(sx, sy)] = (210, 220, 240, 255) if dist > 22 else (110, 120, 145, 255)
+
+        # Core Iron Sphere with Sphere Shading
+        for y in range(cy - 15, cy + 16):
+            for x in range(cx - 15, cx + 16):
+                dx = (x - cx) / 14.0
+                dy = (y - cy) / 14.0
+                dist_sq = dx*dx + dy*dy
+                if dist_sq <= 1.0:
+                    if dx < -0.3 and dy < -0.3: px[(x, y)] = (150, 165, 195, 255)
+                    elif dx < 0 and dy < 0: px[(x, y)] = (95, 105, 130, 255)
+                    elif dy > 0.4: px[(x, y)] = (40, 45, 60, 255)
+                    else: px[(x, y)] = (65, 75, 95, 255)
+                elif dist_sq <= 1.15:
+                    px[(x, y)] = OUTLINE
+
+        # Giant Staring Oval Eyes
+        p_offset = 1 if f in [1, 2] else -1
+        for (ecx, is_left) in [(cx - 5.5, True), (cx + 5.5, False)]:
+            fill_ellipse(px, ecx, cy - 1, 3.2, 5.0, WHITE)
+            fill_ellipse(px, ecx + p_offset * 0.8, cy - 1, 1.8, 3.0, BLACK)
+            px[(int(ecx + p_offset * 0.8), cy - 2)] = WHITE
+
+        draw_pixels(img, px)
+        frames.append(img)
+    scale_and_save_webp(frames, "assets/sprites/enemy_gordo.webp", 180)
+
+
+# ==========================================
+# 20. 敵キャラ：ブロントバート (Bronto Burt - Cute Fluttering HD)
+# ==========================================
+def generate_bronto_burt():
+    frames = []
+    for f in range(4):
+        img = create_frame()
+        px = {}
+        cx, cy = 32, 32
+        bob = -2 if f in [1, 3] else 2
         
-        # Cute face
-        px[(cx - 2, cy)] = BLACK
-        px[(cx + 2, cy)] = BLACK
-        px[(cx - 3, cy + 1)] = (255, 120, 120, 255)
-        px[(cx + 3, cy + 1)] = (255, 120, 120, 255)
+        # Feathered Wings Fluttering
+        wing_y = cy - 6 + bob + (-5 if f in [0, 2] else 5)
+        for (wx, is_left) in [(cx - 16, True), (cx + 16, False)]:
+            fill_ellipse(px, wx, wing_y, 8.0, 5.0, WHITE)
+            fill_ellipse(px, wx + (-1 if is_left else 1), wing_y, 6.0, 3.5, (235, 245, 255, 255))
 
-        # Stink steam particle
-        sy = cy - 8 - (frame_idx * 2) % 6
-        px[(cx - 3, sy)] = (150, 180, 100, 200)
-        px[(cx + 3, sy - 1)] = (150, 180, 100, 200)
+        # Round Pinkish-Purple Body
+        for y in range(cy - 14 + bob, cy + 15 + bob):
+            for x in range(cx - 14, cx + 15):
+                dx = (x - cx) / 13.0
+                dy = (y - (cy + bob)) / 13.0
+                dist_sq = dx*dx + dy*dy
+                if dist_sq <= 1.0:
+                    if dx < -0.25 and dy < -0.25: px[(x, y)] = (255, 140, 185, 255)
+                    elif dy > 0.4: px[(x, y)] = (185, 40, 95, 255)
+                    else: px[(x, y)] = (235, 75, 130, 255)
+                elif dist_sq <= 1.18:
+                    px[(x, y)] = OUTLINE
 
-        draw_pixels(img, px)
-        frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/poop.webp", 200)
+        # Fierce Angry Slanted Eyes (キリッと怒った鋭いツリ目)
+        for (ecx, is_left) in [(cx - 5.5, True), (cx + 5.5, False)]:
+            ecy = cy - 2.0 + bob
+            sgn = -1 if is_left else 1
+            
+            # Slanted oval white eye & black pupil
+            for dy in range(-4, 5):
+                for dx in range(-4, 5):
+                    # Rotate coordinates for slanted eye angle
+                    angle = math.radians(-sgn * 25)
+                    u = (dx * math.cos(angle) - dy * math.sin(angle))
+                    v = (dx * math.sin(angle) + dy * math.cos(angle))
+                    
+                    dist = (u / 2.6)**2 + (v / 3.8)**2
+                    if dist <= 1.0:
+                        # Slanted brow cutoff
+                        if v < -0.7 and u * sgn > -0.8:
+                            px[(int(ecx + dx), int(ecy + dy))] = OUTLINE
+                        else:
+                            px[(int(ecx + dx), int(ecy + dy))] = WHITE
+                            # Sharp dark pupil glaring inward
+                            p_dx = dx - sgn * 0.5
+                            p_dy = dy + 0.2
+                            if (p_dx / 1.5)**2 + (p_dy / 2.2)**2 <= 1.0:
+                                px[(int(ecx + dx), int(ecy + dy))] = (20, 15, 35, 255)
+                                if abs(dx - sgn * 0.2) < 0.8 and dy == 0:
+                                    px[(int(ecx + dx), int(ecy + dy))] = WHITE
+                    elif dist <= 1.35:
+                        px[(int(ecx + dx), int(ecy + dy))] = OUTLINE
 
-def generate_sick_kirby():
-    frames = []
-    for frame_idx in range(4):
-        img = create_frame()
-        px = {}
-        cx, cy = 16, 17
-        bob = 1 if frame_idx in [1, 3] else 0
+            # Sharp Angry Brow Over Eyelid
+            for i in range(-4, 5):
+                bx = int(ecx + i)
+                by = int(ecy - 3 - sgn * i * 0.6)
+                px[(bx, by)] = OUTLINE
+                px[(bx, by + 1)] = OUTLINE
 
-        # Pale / sickly pink body
-        PALE_PINK = (245, 180, 195, 255)
-        PALE_SHADOW = (210, 140, 160, 255)
-        for y in range(cy - 7 + bob, cy + 8 + bob):
-            for x in range(cx - 7, cx + 8):
-                if (x - cx)**2 + (y - (cy + bob))**2 <= 7.0**2:
-                    px[(x, y)] = PALE_PINK if y < cy + bob else PALE_SHADOW
-
-        # Pale feet
-        px[(cx - 5, cy + 7 + bob)] = (200, 100, 120, 255)
-        px[(cx + 5, cy + 7 + bob)] = (200, 100, 120, 255)
-
-        # Sick dizzy swirl eyes (@ @)
-        if frame_idx % 2 == 0:
-            px[(cx - 3, cy - 1 + bob)] = BLACK
-            px[(cx - 2, cy - 2 + bob)] = BLACK
-            px[(cx - 1, cy - 1 + bob)] = BLACK
-            px[(cx - 2, cy + bob)] = BLACK
-            px[(cx + 1, cy - 1 + bob)] = BLACK
-            px[(cx + 2, cy - 2 + bob)] = BLACK
-            px[(cx + 3, cy - 1 + bob)] = BLACK
-            px[(cx + 2, cy + bob)] = BLACK
-        else:
-            px[(cx - 3, cy - 2 + bob)] = BLACK
-            px[(cx - 1, cy + bob)] = BLACK
-            px[(cx + 1, cy - 2 + bob)] = BLACK
-            px[(cx + 3, cy + bob)] = BLACK
-
-        # Forehead ice pack / bandage (ひえぴた / 氷のう)
-        for bx in range(cx - 4, cx + 5):
-            for by in range(cy - 10 + bob, cy - 6 + bob):
-                px[(bx, by)] = (100, 200, 255, 255)
-        px[(cx, cy - 11 + bob)] = (255, 255, 255, 255) # Ice bag tie
-
-        # Blue face gradient (青ざめ)
-        px[(cx - 4, cy + bob)] = (120, 160, 220, 200)
-        px[(cx + 4, cy + bob)] = (120, 160, 220, 200)
-
-        # Wavy sick mouth ~
-        px[(cx - 1, cy + 2 + bob)] = BLACK
-        px[(cx, cy + 3 + bob)] = BLACK
-        px[(cx + 1, cy + 2 + bob)] = BLACK
-
-        draw_pixels(img, px)
-        frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/pet_sick.webp", 250)
-
-def generate_ghost_kirby():
-    frames = []
-    for frame_idx in range(4):
-        img = create_frame()
-        px = {}
-        cx, cy = 16, 15
-        float_y = -1 if frame_idx in [1, 2] else 1
-
-        # Ghostly transparent white-blue body with tail
-        GHOST_WHITE = (235, 245, 255, 220)
-        GHOST_SHADOW = (180, 210, 240, 200)
-        for y in range(cy - 7 + float_y, cy + 6 + float_y):
-            for x in range(cx - 7, cx + 8):
-                if (x - cx)**2 + (y - (cy + float_y))**2 <= 7.0**2:
-                    px[(x, y)] = GHOST_WHITE
+        # Angry Determined Mouth (キリッとしたへの字口)
+        for mx in range(cx - 3, cx + 4):
+            my = cy + 5 + bob + abs(mx - cx) // 2
+            px[(mx, my)] = OUTLINE
+            px[(mx, my - 1)] = (175, 20, 55, 255)
         
-        # Ghost tail ripples
-        tail_shift = frame_idx % 2
-        for tx in range(cx - 5, cx + 6):
-            if (tx + tail_shift) % 2 == 0:
-                px[(tx, cy + 7 + float_y)] = GHOST_SHADOW
-                px[(tx, cy + 8 + float_y)] = GHOST_SHADOW
-
-        # Triangle headband (死冠・三角頭巾)
-        for ty in range(cy - 12 + float_y, cy - 6 + float_y):
-            t_w = (cy - 6 + float_y - ty) // 2
-            for tx in range(cx - t_w, cx + t_w + 1):
-                px[(tx, ty)] = WHITE
-        px[(cx, cy - 10 + float_y)] = (255, 50, 50, 255) # Red dot
-
-        # Empty black ghost eyes
-        px[(cx - 3, cy - 2 + float_y)] = BLACK
-        px[(cx - 3, cy - 1 + float_y)] = BLACK
-        px[(cx + 3, cy - 2 + float_y)] = BLACK
-        px[(cx + 3, cy - 1 + float_y)] = BLACK
-
-        # Round open 'o' mouth
-        px[(cx, cy + 2 + float_y)] = BLACK
-        px[(cx, cy + 3 + float_y)] = BLACK
-
-        # Will-o-wisp / Ghost fire (ひとだま)
-        w_x = cx + 9 + (frame_idx % 2)
-        w_y = cy - 4 - float_y
-        px[(w_x, w_y)] = (100, 220, 255, 240)
-        px[(w_x, w_y - 1)] = (200, 255, 255, 240)
+        # Little feet
+        fill_ellipse(px, cx - 4, cy + 12 + bob, 2.5, 1.5, (255, 200, 40, 255))
+        fill_ellipse(px, cx + 4, cy + 12 + bob, 2.5, 1.5, (255, 200, 40, 255))
 
         draw_pixels(img, px)
         frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/pet_ghost.webp", 200)
+    scale_and_save_webp(frames, "assets/sprites/enemy_bronto_burt.webp", 150)
 
-def generate_action_sprites():
-    # すいこみ (Inhale)
+
+# ==========================================
+# 21. 敵キャラ追加：メタナイト (Meta Knight - Ultra Cool HD)
+# ==========================================
+def draw_meta_knight_bat_wings(px, cx, cy, bob, f):
+    """
+    Ultra-detailed, realistic bat wings (リアルで迫力あるコウモリ/悪魔の翼)
+    Features:
+      - Articulated upper arm bone with golden elbow/wrist talon
+      - 3 radiating finger bones (struts) forming sharp wing tips
+      - Scalloped (crescent cutout) leathery membrane with smooth purple gradient
+      - Dynamic flapping animation (4 frames)
+    """
+    WING_OUTLINE = (20, 10, 45, 255)
+    WING_DARK = (45, 18, 85, 255)
+    WING_MID = (70, 32, 125, 255)
+    WING_LIGHT = (105, 52, 175, 255)
+    WING_BONE_LIGHT = (145, 80, 220, 255)
+    WING_TALON = (255, 215, 40, 255)
+    WING_TALON_LIGHT = (255, 255, 180, 255)
+
+    flap_offsets = [-3, 0, 3, 0]
+    flap = flap_offsets[f % 4]
+
+    def point_in_triangle(pt, v1, v2, v3):
+        def sign(p1, p2, p3):
+            return (p1[0] - p3[0]) * (p2[1] - p3[1]) - (p2[0] - p3[0]) * (p1[1] - p3[1])
+        d1 = sign(pt, v1, v2)
+        d2 = sign(pt, v2, v3)
+        d3 = sign(pt, v3, v1)
+        has_neg = (d1 < 0) or (d2 < 0) or (d3 < 0)
+        has_pos = (d1 > 0) or (d2 > 0) or (d3 > 0)
+        return not (has_neg and has_pos)
+
+    def draw_thick_line(px, p1, p2, color, thickness=1):
+        x1, y1 = p1
+        x2, y2 = p2
+        dist = max(1, int(math.hypot(x2 - x1, y2 - y1) * 2))
+        for i in range(dist + 1):
+            t = i / dist
+            x = int(x1 + t * (x2 - x1))
+            y = int(y1 + t * (y2 - y1))
+            for tx in range(-thickness, thickness + 1):
+                for ty in range(-thickness, thickness + 1):
+                    if tx*tx + ty*ty <= thickness*thickness:
+                        px[(x + tx, y + ty)] = color
+
+    for is_left in [True, False]:
+        sgn = -1 if is_left else 1
+
+        # Key Anchors
+        root = (cx + sgn * 6, cy - 2 + bob)
+        joint = (cx + sgn * 22, cy - 15 + bob + flap)
+        tip1 = (cx + sgn * 29, cy - 4 + bob + int(flap * 1.3))
+        tip2 = (cx + sgn * 25, cy + 8 + bob + int(flap * 0.8))
+        tip3 = (cx + sgn * 15, cy + 14 + bob + int(flap * 0.4))
+
+        # 1. Fill Membrane Polygons
+        triangles = [
+            (root, joint, tip1),
+            (root, tip1, tip2),
+            (root, tip2, tip3)
+        ]
+
+        min_x = min(root[0], joint[0], tip1[0], tip2[0], tip3[0]) - 2
+        max_x = max(root[0], joint[0], tip1[0], tip2[0], tip3[0]) + 2
+        min_y = min(root[1], joint[1], tip1[1], tip2[1], tip3[1]) - 2
+        max_y = max(root[1], joint[1], tip1[1], tip2[1], tip3[1]) + 2
+
+        # Scallop cutout circles (centers placed to carve inner curves)
+        # Cutout 1: between tip1 and tip2
+        c1_x = (tip1[0] + tip2[0]) / 2 - sgn * 2.5
+        c1_y = (tip1[1] + tip2[1]) / 2 - 1.5
+        r1_sq = (math.hypot(tip1[0] - tip2[0], tip1[1] - tip2[1]) * 0.44)**2
+
+        # Cutout 2: between tip2 and tip3
+        c2_x = (tip2[0] + tip3[0]) / 2 - sgn * 2.0
+        c2_y = (tip2[1] + tip3[1]) / 2 - 1.0
+        r2_sq = (math.hypot(tip2[0] - tip3[0], tip2[1] - tip3[1]) * 0.44)**2
+
+        # Cutout 3: between tip3 and root
+        c3_x = (tip3[0] + root[0]) / 2 - sgn * 1.5
+        c3_y = (tip3[1] + root[1]) / 2 + 1.0
+        r3_sq = (math.hypot(tip3[0] - root[0], tip3[1] - root[1]) * 0.44)**2
+
+        for y in range(min_y, max_y + 1):
+            for x in range(min_x, max_x + 1):
+                pt = (x, y)
+                # Check if in any triangle
+                in_membrane = any(point_in_triangle(pt, v1, v2, v3) for v1, v2, v3 in triangles)
+                if in_membrane:
+                    # Check if inside scalloped cutouts
+                    in_cut1 = (x - c1_x)**2 + (y - c1_y)**2 < r1_sq
+                    in_cut2 = (x - c2_x)**2 + (y - c2_y)**2 < r2_sq
+                    in_cut3 = (x - c3_x)**2 + (y - c3_y)**2 < r3_sq
+
+                    if not (in_cut1 or in_cut2 or in_cut3):
+                        # Gradient shading based on height & depth
+                        rel_y = (y - min_y) / max(1, (max_y - min_y))
+                        dist_root = math.hypot(x - root[0], y - root[1])
+                        
+                        if rel_y < 0.25:
+                            px[(x, y)] = WING_LIGHT
+                        elif rel_y < 0.65 and dist_root > 6:
+                            px[(x, y)] = WING_MID
+                        else:
+                            px[(x, y)] = WING_DARK
+
+        # 2. Draw Skeletal Arm & Strut Bones (Thick lines with highlights)
+        # Main Upper Arm
+        draw_thick_line(px, root, joint, WING_MID, thickness=1)
+        draw_thick_line(px, (root[0], root[1]-1), (joint[0], joint[1]-1), WING_BONE_LIGHT, thickness=0)
+
+        # Finger Struts
+        draw_thick_line(px, joint, tip1, WING_MID, thickness=1)
+        draw_thick_line(px, joint, tip2, WING_MID, thickness=1)
+        draw_thick_line(px, root, tip3, WING_DARK, thickness=1)
+
+        # Bone Highlights
+        draw_thick_line(px, (joint[0] - sgn, joint[1] - 1), (tip1[0] - sgn, tip1[1] - 1), WING_BONE_LIGHT, thickness=0)
+        draw_thick_line(px, (joint[0] - sgn, joint[1]), (tip2[0] - sgn, tip2[1]), WING_BONE_LIGHT, thickness=0)
+
+        # 3. Outer Edge Outline
+        for y in range(min_y - 1, max_y + 2):
+            for x in range(min_x - 1, max_x + 2):
+                if (x, y) in px and px[(x, y)] in [WING_DARK, WING_MID, WING_LIGHT, WING_BONE_LIGHT]:
+                    # Check if neighbor is empty
+                    for nx, ny in [(x+1,y), (x-1,y), (x,y+1), (x,y-1)]:
+                        if (nx, ny) not in px:
+                            px[(nx, ny)] = WING_OUTLINE
+
+        # 4. Golden Talons on Wing Joints & Tips
+        # Elbow/Wrist Upper Talon
+        fill_circle(px, joint[0], joint[1], 1.8, WING_TALON)
+        px[(joint[0], joint[1] - 1)] = WING_TALON_LIGHT
+        px[(joint[0] + sgn * 2, joint[1] - 2)] = WING_TALON
+        px[(joint[0] + sgn * 3, joint[1] - 3)] = WING_TALON_LIGHT
+
+        # Sharp claw tips
+        px[tip1] = WING_TALON
+        px[(tip1[0] + sgn, tip1[1])] = WING_TALON_LIGHT
+        px[tip2] = WING_TALON
+        px[tip3] = WING_TALON
+
+
+def generate_meta_knight():
     frames = []
-    for frame_idx in range(4):
+    MK_NAVY = (35, 45, 95, 255)
+    MK_NAVY_LIGHT = (55, 70, 135, 255)
+    MK_NAVY_DARK = (20, 25, 60, 255)
+    
+    MASK_SILVER = (200, 210, 225, 255)
+    MASK_LIGHT = (245, 250, 255, 255)
+    MASK_SHADOW = (130, 145, 170, 255)
+    MASK_DARK = (75, 85, 105, 255)
+    
+    for f in range(4):
         img = create_frame()
         px = {}
-        cx, cy = 16, 16
-        mouth_size = 4 + frame_idx % 2 * 2
-        draw_feet(px, cx, cy)
-        draw_base_body(px, cx, cy, radius=8)
-        # Giant open mouth
-        for my in range(cy - mouth_size//2, cy + mouth_size//2 + 2):
-            for mx in range(cx - 2, cx + 8):
-                px[(mx, my)] = (120, 10, 30, 255)
-        # Swirling wind lines into mouth
-        for wx in range(cx + 8, cx + 15):
-            wy = cy + (wx + frame_idx * 3) % 5 - 2
-            if 0 <= wy < SIZE:
-                px[(wx, wy)] = (255, 255, 255, 220)
-        draw_eyes_and_cheeks(px, cx - 2, cy - 1)
+        cx, cy = 32, 34
+        bob = -1 if f in [1, 2] else 0
+        eye_glow = (255, 240, 50, 255) if f % 2 == 0 else (255, 210, 20, 255)
+        
+        # 1. Realistic Dimensional Bat Wings Flapping in Background
+        draw_meta_knight_bat_wings(px, cx, cy, bob, f)
+
+        # 2. Shoulder Pauldrons (White/Silver with Gold Trim)
+        fill_ellipse(px, cx - 15, cy - 6 + bob, 4.5, 4.0, MASK_SILVER)
+        fill_ellipse(px, cx - 15, cy - 7 + bob, 3.5, 2.5, MASK_LIGHT)
+        for a in range(0, 360, 30):
+            rad = math.radians(a)
+            px[(int(cx - 15 + 4.5 * math.cos(rad)), int(cy - 6 + bob + 4.0 * math.sin(rad)))] = (255, 215, 0, 255)
+
+        fill_ellipse(px, cx + 15, cy - 6 + bob, 4.5, 4.0, MASK_SILVER)
+        fill_ellipse(px, cx + 15, cy - 7 + bob, 3.5, 2.5, MASK_LIGHT)
+        for a in range(0, 360, 30):
+            rad = math.radians(a)
+            px[(int(cx + 15 + 4.5 * math.cos(rad)), int(cy - 6 + bob + 4.0 * math.sin(rad)))] = (255, 215, 0, 255)
+
+        # 3. Navy Blue Feet
+        for fx in [cx - 10, cx + 10]:
+            fill_ellipse(px, fx, cy + 14 + bob, 6.0, 3.5, (120, 40, 160, 255))
+            fill_ellipse(px, fx, cy + 13 + bob, 5.0, 2.0, (160, 70, 205, 255))
+
+        # 4. Round Navy Body
+        for y in range(cy - 16 + bob, cy + 15 + bob):
+            for x in range(cx - 16, cx + 17):
+                dx = (x - cx) / 15.0
+                dy = (y - (cy + bob)) / 15.0
+                dist_sq = dx*dx + dy*dy
+                if dist_sq <= 1.0:
+                    if dx < -0.25 and dy < -0.25: px[(x, y)] = MK_NAVY_LIGHT
+                    elif dy > 0.4: px[(x, y)] = MK_NAVY_DARK
+                    else: px[(x, y)] = MK_NAVY
+                elif dist_sq <= 1.18:
+                    px[(x, y)] = OUTLINE
+
+        # 5. Silver Mask (Faceplate)
+        for y in range(cy - 13 + bob, cy + 9 + bob):
+            for x in range(cx - 13, cx + 14):
+                dx = (x - cx) / 12.5
+                dy = (y - (cy - 2 + bob)) / 10.0
+                dist_sq = dx*dx + dy*dy
+                if dist_sq <= 1.0:
+                    if dx < -0.2 and dy < -0.2: px[(x, y)] = MASK_LIGHT
+                    elif dx > 0.3 or dy > 0.4: px[(x, y)] = MASK_SHADOW
+                    else: px[(x, y)] = MASK_SILVER
+                elif dist_sq <= 1.18:
+                    px[(x, y)] = MASK_DARK
+
+        # Mask T-Slit / Visor Cutouts & Glowing Yellow Eyes
+        # Slit line
+        for y in range(cy - 8 + bob, cy + 7 + bob):
+            px[(cx, y)] = MASK_DARK
+        for x in range(cx - 10, cx + 11):
+            px[(x, cy - 2 + bob)] = MASK_DARK
+
+        # Glowing Yellow Eyes (Piercing Angled Eyes)
+        for (ecx, is_left) in [(cx - 5.5, True), (cx + 5.5, False)]:
+            ecy = cy - 2.0 + bob
+            # Slanted oval eye
+            for dx in range(-4, 4):
+                for dy in range(-2, 3):
+                    if is_left:
+                        if abs(dx + dy * 0.5) <= 2.5 and abs(dy) <= 1.8:
+                            px[(int(ecx + dx), int(ecy + dy))] = eye_glow
+                    else:
+                        if abs(dx - dy * 0.5) <= 2.5 and abs(dy) <= 1.8:
+                            px[(int(ecx + dx), int(ecy + dy))] = eye_glow
+            px[(int(ecx), int(ecy - 1))] = WHITE
+
+        # 6. Legendary Golden Sword Galaxia in Hand!
+        sw_x = cx + 17
+        sw_y = cy + 4 + bob
+        fill_circle(px, sw_x, sw_y, 4.0, MK_NAVY) # Hand
+        
+        # Golden Spiked Hilt
+        for gy in range(sw_y - 4, sw_y + 5):
+            px[(sw_x + 1, gy)] = (255, 215, 0, 255)
+            px[(sw_x + 2, gy)] = (255, 180, 0, 255)
+        # Ruby Gem on Hilt
+        px[(sw_x + 1, sw_y)] = (255, 40, 80, 255)
+        
+        # Jagged Golden Blade (Galaxia)
+        for i in range(1, 18):
+            bx = sw_x + int(i * 0.6)
+            by = sw_y - i
+            px[(bx, by)] = (255, 255, 200, 255) # Core
+            px[(bx + 1, by)] = (255, 215, 0, 255) # Edge
+            # Lightning spikes on Galaxia blade
+            if i in [5, 6, 11, 12]:
+                px[(bx + 2, by)] = (255, 215, 0, 255)
+                px[(bx - 1, by)] = (255, 215, 0, 255)
+
         draw_pixels(img, px)
         frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/pet_inhale.webp", 120)
+    scale_and_save_webp(frames, "assets/sprites/enemy_meta_knight.webp", 160)
 
-    # もぐもぐ (Eating)
-    frames = []
-    for frame_idx in range(4):
-        img = create_frame()
-        px = {}
-        cx, cy = 16, 16
-        chew = 1 if frame_idx % 2 == 1 else -1
-        draw_feet(px, cx, cy)
-        draw_base_body(px, cx, cy, radius=7.5, squash=chew)
-        draw_hands(px, cx, cy, h_up=True)
-        draw_eyes_and_cheeks(px, cx, cy, happy=True)
-        # Chewing cheeks puffed out
-        px[(cx - 6, cy + 2)] = CHEEK
-        px[(cx + 6, cy + 2)] = CHEEK
-        # Crumbs
-        if frame_idx % 2 == 1:
-            px[(cx + 4, cy + 4)] = (255, 200, 50, 255)
-            px[(cx - 4, cy + 4)] = (255, 100, 50, 255)
-        draw_pixels(img, px)
-        frames.append(img)
-    scale_and_save_webp(frames, "assets/sprites/pet_eating.webp", 140)
 
+# ==========================================
+# Run all generator functions
+# ==========================================
 if __name__ == "__main__":
+    print("Starting generation of 64x64 HD cute rounded pixel art sprites...")
     generate_baby_kirby()
     generate_normal_kirby()
     generate_fire_kirby()
@@ -916,12 +1484,14 @@ if __name__ == "__main__":
     generate_spark_cutter()
     generate_frost_spark()
     generate_star_legend()
-    generate_waddle_dee()
-    generate_bronto_burt()
-    generate_gordo()
-    generate_dedede()
-    generate_action_sprites()
-    generate_poop()
+    generate_eating_kirby()
+    generate_inhale_kirby()
     generate_sick_kirby()
     generate_ghost_kirby()
-    print("All WebP sprites generated successfully!")
+    generate_poop()
+    generate_waddle_dee()
+    generate_king_dedede()
+    generate_gordo()
+    generate_bronto_burt()
+    generate_meta_knight()
+    print("All 21 HD sprites generated successfully!")

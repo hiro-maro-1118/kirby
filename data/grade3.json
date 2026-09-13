@@ -9,8 +9,13 @@
       "monster": "waddle_dee",
       "foodReward": "apple",
       "question": "24このアメを 4人に同じ数ずつ分けると、1人何こもらえる？",
-      "options": ["5こ", "6こ", "7こ", "8こ"],
-      "answer": 1,
+      "options": [
+        "6こ",
+        "7こ",
+        "8こ",
+        "5こ"
+      ],
+      "answer": 0,
       "hint": "24 ÷ 4 を計算しよう！",
       "explanation": "24 ÷ 4 ＝ 6こ です。"
     },
@@ -19,11 +24,16 @@
       "subject": "理科",
       "type": "choice",
       "unit": "チョウの育ち方",
-      "monster": "bronto_burt",
+      "monster": "gordo",
       "foodReward": "spark_soda",
       "question": "チョウが「たまご ➔ よう虫（あおむし）」の次になる姿はどれ？",
-      "options": ["成虫（せいちゅう）", "さなぎ", "まゆ", "みみず"],
-      "answer": 1,
+      "options": [
+        "まゆ",
+        "みみず",
+        "成虫（せいちゅう）",
+        "さなぎ"
+      ],
+      "answer": 3,
       "hint": "動かなくなって羽が生える準備をする時期だよ！",
       "explanation": "チョウは「たまご ➔ よう虫 ➔ さなぎ ➔ 成虫」の順に完全変態します。"
     },
@@ -36,7 +46,12 @@
       "foodReward": "chili_curry",
       "question": "地図記号で「文」の文字は何の建物を表しているでしょう？（漢字2文字）",
       "answer": "学校",
-      "acceptable": ["学校", "小学校", "中学校", "がっこう"],
+      "acceptable": [
+        "学校",
+        "小学校",
+        "中学校",
+        "がっこう"
+      ],
       "hint": "みんなが毎日勉強しに行く場所だよ！",
       "explanation": "「文」の地図記号は小学校や中学校を表します。"
     }

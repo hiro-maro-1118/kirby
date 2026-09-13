@@ -84,7 +84,19 @@ export class QuizEngine {
     
     // 復活モードは1問、通常は最大5問
     const count = this.isReviveMode ? 1 : Math.min(5, shuffled.length);
-    this.sessionQuestions = shuffled.slice(0, count);
+    const selected = shuffled.slice(0, count);
+
+    // 選択肢問題（choice, passage）の選択肢順序を動的にランダムシャッフルして解答番号を完全に分散
+    this.sessionQuestions = selected.map(rawQ => {
+      const q = { ...rawQ };
+      if ((q.type === 'choice' || q.type === 'passage') && Array.isArray(q.options) && q.options.length > 1) {
+        const correctText = q.options[q.answer];
+        const shuffledOpts = [...q.options].sort(() => Math.random() - 0.5);
+        q.options = shuffledOpts;
+        q.answer = shuffledOpts.indexOf(correctText);
+      }
+      return q;
+    });
 
     this.currentQuestion = this.sessionQuestions[0];
     this.currentEnemySprite = `./assets/sprites/enemy_${this.currentQuestion.monster || 'waddle_dee'}.webp`;
